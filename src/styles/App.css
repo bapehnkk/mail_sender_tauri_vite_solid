@@ -1,0 +1,162 @@
+@import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@300&display=swap");
+:root {
+  --dark: #24292F;
+  --white: #ffffff;
+  --gray: #F6F8FA;
+  --gray-darker: #EFF3F6;
+  --gray-dark: #D0D7DE;
+  --header-text: #BEBFC1;
+  --filter-white: brightness(0) saturate(100%) invert(92%) sepia(93%) saturate(0%) hue-rotate(202deg) brightness(106%) contrast(106%);
+  --filter-text: invert(15%) sepia(4%) saturate(1993%) hue-rotate(173deg) brightness(97%) contrast(96%);
+  --filter-header-text: brightness(0) saturate(100%) invert(89%) sepia(5%) saturate(83%) hue-rotate(182deg) brightness(88%) contrast(86%);
+  --red: #c31525;
+  --red-light: #f3949d;
+  --green: #8DBE14;
+  --green-light: #D2ED90;
+  --yelolow: #CA9D16;
+  --yelolow-light: #FBE399;
+}
+
+*::-webkit-scrollbar {
+  width: 16px;
+}
+
+*:not([no-y-overflow])::-webkit-scrollbar-thumb {
+  height: 56px;
+  border-radius: 8px;
+  border: 4px solid transparent;
+  background-clip: content-box;
+  background-color: #606060;
+}
+
+*::-webkit-scrollbar-thumb {
+  height: 56px;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  border-radius: 8px;
+  border: 4px solid transparent;
+  background-clip: content-box;
+  background-color: hsl(0deg, 0%, 67%);
+}
+
+body {
+  overflow: overlay;
+}
+
+/* Zeroing */
+* {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  font-family: "Merriweather", serif;
+}
+
+*,
+*:before,
+*:after {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+:focus,
+:active {
+  outline: none;
+}
+
+a:focus,
+a:active {
+  outline: none;
+}
+
+nav,
+footer,
+header,
+aside {
+  display: block;
+}
+
+html,
+body, #root {
+  min-height: 100%;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  line-height: 1;
+  font-size: 3vh;
+  -ms-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+@media (max-height: 500px) {
+  html,
+  body, #root {
+    font-size: 3.4vh;
+  }
+}
+@media (max-height: 380px) {
+  html,
+  body, #root {
+    font-size: 4vh;
+  }
+}
+
+body {
+  height: max-content;
+}
+
+input,
+button,
+textarea {
+  font-family: inherit;
+}
+
+input::-ms-clear {
+  display: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+button::-moz-focus-inner {
+  padding: 0;
+  border: 0;
+}
+
+a,
+a:visited {
+  text-decoration: none;
+}
+
+ul li {
+  list-style: none;
+}
+
+img {
+  vertical-align: top;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: 400;
+}
+
+img {
+  user-select: none;
+}
+
+.logo.vite:hover {
+  filter: drop-shadow(0 0 2em #747bff);
+}
+
+.logo.solid:hover {
+  filter: drop-shadow(0 0 2em #2f5d90);
+}
+
+/*# sourceMappingURL=App.css.map */
