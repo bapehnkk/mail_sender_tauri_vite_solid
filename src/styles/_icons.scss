@@ -1,0 +1,95 @@
+
+.svg {
+    display: inline-block;
+    width: 3rem;
+    height: 3rem;
+    background-size: cover;
+    filter: var(--filter-white);
+    transition: all 0.3s ease;
+
+    &:hover {
+        transition: all 0.3s ease;
+        filter: var(--filter-header-text);
+    }
+
+
+    &.home {
+        background-image: url("../assets/icons/home.svg");
+    }
+
+    &.settings {
+        background-image: url("../assets/icons/settings.svg");
+    }
+
+    &.settings-v2 {
+        background-image: url("../assets/icons/settings_v2.svg");
+    }
+
+    &.contact-email {
+        background-image: url("../assets/icons/contact_email.svg");
+    }
+
+    &.password {
+        background-image: url("../assets/icons/password.svg");
+    }
+
+    &.server {
+        background-image: url("../assets/icons/server.svg");
+    }
+
+    &.port {
+        background-image: url("../assets/icons/port.svg");
+    }
+
+    &.sender {
+        background-image: url("../assets/icons/sender.svg");
+    }
+
+    &.title {
+        background-image: url("../assets/icons/title.svg");
+    }
+
+    &.edit-doc {
+        background-image: url("../assets/icons/edit_doc.svg");
+    }
+
+    &.border-color {
+        background-image: url("../assets/icons/border_color.svg");
+    }
+    &.recipient {
+        background-image: url("../assets/icons/recipient.svg");
+    }
+    &.send_mail {
+        background-image: url("../assets/icons/send_mail.svg");
+    }
+    &.html {
+        background-image: url("../assets/icons/html.svg");
+    }
+    &.files {
+        background-image: url("../assets/icons/files.svg");
+    }
+    &.visibility {
+        background-image: url("../assets/icons/visibility.svg");
+    }
+    &.pdf {
+        background-image: url("../assets/icons/pdf.svg");
+    }
+    &.file-present {
+        background-image: url("../assets/icons/file_present.svg");
+    }
+    &.excel {
+        background-image: url("../assets/icons/excel.svg");
+    }
+    &.api-key {
+        background-image: url("../assets/icons/api_key.svg");
+    }
+    &.pending {
+        background-image: url("../assets/icons/pending.svg");
+    }
+    &.check {
+        background-image: url("../assets/icons/check.svg");
+    }
+    &.cancel {
+        background-image: url("../assets/icons/cancel.svg");
+    }
+}

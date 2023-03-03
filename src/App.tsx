@@ -1,15 +1,57 @@
 import {createSignal} from "solid-js";
 import logo from "./assets/logo.svg";
 import {invoke} from "@tauri-apps/api/tauri";
-import "./styles/App.css";
 import {Button, Stack} from "@suid/material";
-import CustomButton from "./components/Buttons";
-import CustomTheme from "./styles/Theme";
 import Home from "./screens/Home";
 import AppRoutes from "./router";
 import Header from "./components/Header";
+import {Transition} from "solid-transition-group";
+import {onMount} from 'solid-js';
+
 
 function App() {
+    // function animateBackgroundColor(element: any) {
+    //     let change = 1.0;
+    //     if (change >= 0.3) {
+    //         setInterval(function () {
+    //             const root = document.documentElement;
+    //             if (root) {
+    //                 root.style.setProperty("--scroll-bar-color", `rgba(96, 96, 96, ${change})`);
+    //             }
+    //             change -= 0.01;
+    //         }, 10);
+    //     }
+    // }
+    //
+    // const handleScroll = (e: any) => {
+    //     // check the direction of the scroll
+    //     if (e.deltaY > 0) {
+    //         console.log('scrolling down');
+    //         // do something when scrolling down
+    //     } else {
+    //         console.log('scrolling up');
+    //         // do something when scrolling up
+    //     }
+    // };
+
+    onMount(() => {
+        let isScrolling: any;
+        window.addEventListener('scroll', function (event) {
+            const root = document.documentElement;
+            if (root) {
+                root.style.setProperty("--scroll-bar-color", "rgba(96, 96, 96, 1)");
+            }
+            window.clearTimeout(isScrolling);
+            isScrolling = setTimeout(function () {
+                if (root) {
+                    root.style.setProperty("--scroll-bar-color", "rgba(96, 96, 96, 0.3)");
+                }
+            }, 66);
+        }, false);
+    });
+    /////////////////////////////////////////////////////////////////////////////////////////////
+    // ####################################################################################### //
+    /////////////////////////////////////////////////////////////////////////////////////////////
     const [greetMsg, setGreetMsg] = createSignal("");
     const [name, setName] = createSignal("");
 
@@ -21,14 +63,22 @@ function App() {
     return (
         <>
             <Header/>
-            <Stack spacing={2} >
 
-                <Stack direction="row" justifyContent={"center"} spacing={2}>
-                    <CustomButton>awwaww</CustomButton>
-                </Stack>
+            <Transition
+                mode="outin"
+                onExit={(el, done) => {
+                    const a = el.animate([{opacity: 1}, {opacity: 0}], {
+                        duration: 200
+                    });
+                    a.finished.then(done);
+                }}
+            >
+                <AppRoutes/>
+                {/*<div class="container">*/}
+                {/*    <AppRoutes/>*/}
+                {/*</div>*/}
+            </Transition>
 
-                <AppRoutes />
-            </Stack>
         </>
     );
 }

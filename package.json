@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@modular-forms/solid": "^0.10.0",
+    "@solid-primitives/keyboard": "^1.0.8",
     "@solid-primitives/media": "^2.1.2",
     "@solid-primitives/utils": "^5.3.0",
     "@solidjs/router": "^0.7.0",

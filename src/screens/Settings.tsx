@@ -1,13 +1,15 @@
 import { Component } from "solid-js";
-import CustomButton from "../components/Buttons"
 import {Link} from "@solidjs/router";
+import {Button} from "@suid/material";
 
 const HomeScreen: Component = () => {
 
   return (
-      <Link href={"/"}>
-        <CustomButton>Settings Page</CustomButton>
-      </Link>
+      <div class={"container"}>
+          <Link href={"/"}>
+            <Button>Settings Page</Button>
+          </Link>
+      </div>
   );
 };
 

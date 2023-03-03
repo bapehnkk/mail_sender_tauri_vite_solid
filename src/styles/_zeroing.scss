@@ -35,18 +35,18 @@ aside {
 
 
 html,
-body, #root {
+body {
     min-height: 100%;
     height: 100%;
     width: 100%;
     position: relative;
     line-height: 1;
-    font-size: 3vh;
+    font-size: 2vh;
     -ms-text-size-adjust: 100%;
     -moz-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
     @media (max-height: 500px) {
-        font-size: 3.4vh;
+        font-size: 3vh;
     }
     @media (max-height: 380px) {
         font-size: 4vh;

@@ -1,41 +1,31 @@
 import {Link} from "@solidjs/router";
 import {AppBar, Toolbar, Typography, Button} from "@suid/material";
-import CustomTheme from "../styles/Theme";
-import '../styles/header.css';
-import { VsHome, VsSettingsGear  } from 'solid-icons/vs'
+import {VsHome, VsSettingsGear} from 'solid-icons/vs'
+import {Component} from "solid-js";
 
 
-function Header() {
+const Header: Component = () => {
     return (
-        <CustomTheme>
-            <header class={'header'}>
-                <div class="logo">
-                    <Link href="/" class={"logo"}>
-                        <div class="logo__img">
-                            <img src="/logo.svg" alt="Logo"/>
-                        </div>
-                        <div class="logo__text">
-                            Mail Sender
-                        </div>
-                    </Link>
+        <header>
+            <div class="logo">
+                <img src="/logo.svg" class="logo__img"/>
+                <div class="logo__text">
+                    Mail sender
                 </div>
-                <div class={"links"}>
-
-                    <Link href="/">
-                        <Button variant="text">
-                            <VsHome/>
-                        </Button>
-                    </Link>
-                    <Link  href="/settings">
-                        <Button variant="text">
-                            <VsSettingsGear/>
-                        </Button>
-                    </Link>
-                </div>
-            </header>
-
-
-        </CustomTheme>
+            </div>
+            <div class="links">
+                <Link href="/" class="ripple">
+                    <Button  class="links__icon" id="main">
+                        <span class="svg home"></span>
+                    </Button>
+                </Link>
+                <Link href="/settings" class="ripple">
+                    <Button  class="links__icon" id="settings">
+                        <span class="svg settings"></span>
+                    </Button>
+                </Link>
+            </div>
+        </header>
     );
 }
 

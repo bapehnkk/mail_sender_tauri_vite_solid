@@ -2,11 +2,7 @@
 import { render } from "solid-js/web";
 import { Router } from "@solidjs/router";
 
-import './styles/base.css';
-import './styles/components.css';
-import './styles/fonts.css';
-import './styles/pace.css';
-import './styles/utilities.css';
+import './styles/main.css';
 
 import App from "./App";
 
