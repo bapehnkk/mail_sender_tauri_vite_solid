@@ -2,6 +2,7 @@
     --dark: #24292F;
     --white: #ffffff;
     --gray: #F6F8FA;
+    --gray-alpha: rgba(246, 248, 250, 0.9);
     --gray-darker: #EFF3F6;
     --gray-dark: #D0D7DE;
     --header-text: #BEBFC1;
@@ -326,7 +327,7 @@ body {
 
         &-input {
             width: 90%;
-            background-color: var(--gray);
+            background-color: var(--gray-alpha);
             color: var(--dark);
             padding: 0 1rem;
             border-radius: 0 .3rem .3rem 0;
@@ -866,3 +867,11 @@ input[type=checkbox] {
     }
 }
 
+.fade-enter-active,
+.fade-exit-active {
+  transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-exit-to {
+  opacity: 0;
+}

@@ -3,6 +3,7 @@
   --dark: #24292F;
   --white: #ffffff;
   --gray: #F6F8FA;
+  --gray-alpha: rgba(246, 248, 250, 0.9);
   --gray-darker: #EFF3F6;
   --gray-dark: #D0D7DE;
   --header-text: #BEBFC1;
@@ -567,7 +568,7 @@ header .links a.ripple:active .svg:active {
 }
 .form__field-input {
   width: 90%;
-  background-color: var(--gray);
+  background-color: var(--gray-alpha);
   color: var(--dark);
   padding: 0 1rem;
   border-radius: 0 0.3rem 0.3rem 0;
@@ -1163,6 +1164,16 @@ input[type=checkbox]:checked + label {
 input[type=checkbox]:checked + label:after {
   left: calc(100% - 0.225rem);
   transform: translateX(-100%);
+}
+
+.fade-enter-active,
+.fade-exit-active {
+  transition: opacity 0.5s;
+}
+
+.fade-enter,
+.fade-exit-to {
+  opacity: 0;
 }
 
 /*# sourceMappingURL=main.css.map */

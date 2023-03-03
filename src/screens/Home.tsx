@@ -26,20 +26,40 @@ export default function HomeScreen() {
                     fieldType={"text"}
                     content={"Sender's name"}
                 ></Field>
+
                 <Field
                     svg={"title"}
                     htmlID={"title"}
                     fieldType={"text"}
                     content={"Mail title"}
                     description={"Write [name] or [surname] and select Excel column name if you want to personalize the email"}
-                ></Field>
+                >
+                    <Field
+                        htmlID={"titleInPdf"}
+                        svg={"edit-doc"}
+                        fieldType={"text"}
+                        content={"Chose title in .pdf"}
+                    ></Field>
+                </Field>
+
+
                 <Field
-                    svg={"title"}
-                    htmlID={"title"}
+                    svg={"recipient"}
+                    htmlID={"recipients-name"}
                     fieldType={"text"}
-                    content={"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}
-                    description={"Write [name] or [surname] and select Excel column name if you want to personalize the email"}
+                    content={"Recipient's name"}
+                    description={"Select the column corresponding to the name of the recipient of the letter in Excel"}
                 ></Field>
+
+                <Field
+                    isTextareaType={true}
+                    htmlID={"recipients-name"}
+                    fieldType={"text"}
+                    content={"Recipient's name"}
+                    description={"Select the column corresponding to the name of the recipient of the letter in Excel"}
+                ></Field>
+
+
                 <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
                 <div class="form__field">
                     <label for="sender-name" class="form__field-label">

@@ -60,25 +60,32 @@ function App() {
         setGreetMsg(await invoke("greet", {name: name()}));
     }
 
+    const [show, toggleShow] = createSignal(true);
     return (
         <>
             <Header/>
-
             <Transition
-                mode="outin"
+                onBeforeEnter={(el: any) => (el.style.opacity = 0)}
+                onEnter={(el, done) => {
+                    const a = el.animate([{opacity: 0}, {opacity: 1}], {
+                        duration: 300
+                    });
+                    a.finished.then(done);
+                }}
+                onAfterEnter={(el: any) => (el.style.opacity = 1)}
                 onExit={(el, done) => {
                     const a = el.animate([{opacity: 1}, {opacity: 0}], {
-                        duration: 200
+                        duration: 300
                     });
                     a.finished.then(done);
                 }}
             >
-                <AppRoutes/>
+                {show() && (
+                    <AppRoutes/>)}
                 {/*<div class="container">*/}
                 {/*    <AppRoutes/>*/}
                 {/*</div>*/}
             </Transition>
-
         </>
     );
 }
