@@ -29,6 +29,7 @@
     "@solidjs/router": "^0.7.0",
     "@suid/material": "0.10.2",
     "@tauri-apps/api": "^1.2.0",
+    "filepond": "^4.30.4",
     "solid-icons": "^1.0.4",
     "solid-js": "^1.4.7",
     "solid-js-form": "^0.1.8",

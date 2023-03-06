@@ -52,12 +52,42 @@ export default function HomeScreen() {
                 ></Field>
 
                 <Field
-                    isTextareaType={true}
                     htmlID={"recipients-name"}
-                    fieldType={"text"}
+                    fieldType={"textarea"}
                     content={"Recipient's name"}
                     description={"Select the column corresponding to the name of the recipient of the letter in Excel"}
-                ></Field>
+                >
+                    <Field
+                        svg={"upload"}
+                        htmlID={"choose-file"}
+                        fieldType={"file"}
+                        content={"Choose file:"}
+                    ></Field>
+                    <Field
+                        svg={"upload"}
+                        htmlID={"choose-files"}
+                        fieldType={"files"}
+                        content={"Choose files:"}
+                    ></Field>
+                    <Field
+                        svg={"upload"}
+                        htmlID={"excel-pdf"}
+                        fieldType={"excel"}
+                        content={"Choose excel:"}
+                    ></Field>
+                    <Field
+                        svg={"upload"}
+                        htmlID={"choose-pdf"}
+                        fieldType={"pdf"}
+                        content={"Choose pdf:"}
+                    ></Field>
+                    <Field
+                        svg={"upload"}
+                        htmlID={"choose-html"}
+                        fieldType={"html"}
+                        content={"Choose html:"}
+                    ></Field>
+                </Field>
 
 
                 <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>

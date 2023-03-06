@@ -1,13 +1,12 @@
 import {createEffect, ParentComponent} from "solid-js";
-import {FieldOptions} from "./FormField";
+import {FieldOptions} from "../FormField";
 import {createSignal} from "solid-js";
 import {createKeyHold} from "@solid-primitives/keyboard";
 import InputFieldDescription from "./InputFieldDescription";
-import {openSubSettings, closeSubSettings} from "./FormField";
+import {openSubSettings, closeSubSettings} from "../FormField";
 
 
-
-const InputField: ParentComponent<FieldOptions> = (props) => {
+const TextField: ParentComponent<FieldOptions> = (props) => {
     const [element, setElement] = createSignal<HTMLElement>();
     const pressing = createKeyHold("Escape", {preventDefault: false});
 
@@ -44,4 +43,4 @@ const InputField: ParentComponent<FieldOptions> = (props) => {
         );
 }
 
-export default InputField;
+export default TextField;

@@ -1,6 +1,7 @@
-import {Component, ParentComponent} from "solid-js";
-import InputField from "./InpitField";
-import TextareaField from "./TextareaField";
+import {Component, createSignal, JSX, ParentComponent} from "solid-js";
+import TextField from "./FormFields/TextField";
+import TextareaField from "./FormFields/TextareaField";
+import FileField from "./FormFields/FileField";
 
 const openSubSettings = (element?: HTMLElement) => {
     // console.log("opening");
@@ -23,24 +24,38 @@ const closeSubSettings = (element?: HTMLElement) => {
 };
 
 export type FieldOptions = {
+    fieldType: "text" | "password" | "email" | "excel" | "pdf" | "html" | "file" | "files" | "textarea" | "checkbox",
     htmlID: string,
     svg?: string,
-    fieldType: "text" | "password" | "file" | "files",
     content?: string,
-    description?: string,
-    isTextareaType?: boolean
+    description?: string
+}
+interface FieldTypes {
+  [key: string]: JSX.Element
+}
+
+const getFieldComponent = (props: FieldOptions): JSX.Element =>  {
+  const [fieldComponents] = createSignal<FieldTypes>({
+    textarea: <TextareaField {...props}></TextareaField>,
+
+    text: <TextField {...props}></TextField>,
+    password: <TextField {...props}></TextField>,
+    email: <TextField {...props}></TextField>,
+
+    excel: <FileField {...props}></FileField>,
+    pdf: <FileField {...props}></FileField>,
+    html: <FileField {...props}></FileField>,
+    file: <FileField {...props}></FileField>,
+    files: <FileField {...props}></FileField>,
+
+    checkbox: <TextField {...props}></TextField>
+  });
+
+  return fieldComponents()[props.fieldType];
 }
 
 const Field: ParentComponent<FieldOptions> = (props) => {
-    return (
-        <>
-            {
-                props.isTextareaType ?
-                    <TextareaField {...props}></TextareaField> :
-                    <InputField {...props}></InputField>
-            }
-        </>
-    );
+    return getFieldComponent(props)
 }
 
 export {openSubSettings, closeSubSettings};

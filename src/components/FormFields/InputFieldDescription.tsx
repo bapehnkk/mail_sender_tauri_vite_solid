@@ -1,5 +1,5 @@
 import {ParentComponent} from "solid-js";
-import {FieldOptions} from "./FormField"
+import {FieldOptions} from "../FormField"
 
 const InputFieldDescription: ParentComponent<FieldOptions> = (props) => {
 

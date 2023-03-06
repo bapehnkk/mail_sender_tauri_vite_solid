@@ -1,8 +1,8 @@
 import {createEffect, ParentComponent} from "solid-js";
-import {FieldOptions} from "./FormField";
+import {FieldOptions} from "../FormField";
 import {createSignal} from "solid-js";
 import {createKeyHold} from "@solid-primitives/keyboard";
-import {openSubSettings, closeSubSettings} from "./FormField";
+import {openSubSettings, closeSubSettings} from "../FormField";
 
 
 

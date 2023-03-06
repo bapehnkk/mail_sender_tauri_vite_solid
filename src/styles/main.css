@@ -239,6 +239,9 @@ img {
 .svg.cancel {
   background-image: url("../assets/icons/cancel.svg");
 }
+.svg.upload {
+  background-image: url("../assets/icons/upload.svg");
+}
 
 header {
   width: 100%;
