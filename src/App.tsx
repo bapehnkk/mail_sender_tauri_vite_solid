@@ -7,6 +7,7 @@ import AppRoutes from "./router";
 import Header from "./components/Header";
 import {Transition} from "solid-transition-group";
 import {onMount} from 'solid-js';
+import { Toaster } from 'solid-toast';
 
 
 function App() {
@@ -86,6 +87,7 @@ function App() {
                 {/*    <AppRoutes/>*/}
                 {/*</div>*/}
             </Transition>
+            <Toaster />
         </>
     );
 }

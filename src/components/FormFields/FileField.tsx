@@ -1,6 +1,6 @@
-import {createEffect, ParentComponent, Component} from "solid-js";
+import {createEffect, ParentComponent, Component, onMount, JSX} from "solid-js";
 import {FieldOptions} from "../FormField";
-import {createSignal} from "solid-js";
+import {createSignal, For} from "solid-js";
 import {createKeyHold} from "@solid-primitives/keyboard";
 import InputFieldDescription from "./InputFieldDescription";
 import {openSubSettings, closeSubSettings} from "../FormField";
@@ -8,43 +8,77 @@ import {openSubSettings, closeSubSettings} from "../FormField";
 import {open} from '@tauri-apps/api/dialog';
 import {readBinaryFile, readTextFile} from '@tauri-apps/api/fs';
 
+import {invoke} from '@tauri-apps/api/tauri';
+
+import toast from 'solid-toast';
 
 
-
+const maximumSize = 20 * 1024 * 1024; // 20mb
 
 type FileTypes = {
-    filesPath: null | string | string[]
+    filesPath: null | string | string[],
+    allowedType: string
 }
-const allowedFileTypes = [
+const allowedMimeTypes = [
     "text/html",
-    "application/xhtml+xml",
-    "image/svg+xml",
-    "application/json",
-    "application/pdf"
+    "text/plain",
+    "text/css",
+    "application/pdf",
+    // image
+    "image/apng", "image/avif", "image/gif", "image/jpeg", "image/png", "image/svg+xml", "image/webp",
+    // audio/video
+    "audio/wave", "audio/wav", "audio/x-wav", "audio/x-pn-wav", "audio/webm", "video/webm", "audio/ogg", "video/ogg", "application/ogg"
 ];
 
-const FilePreview: Component<FileTypes> = (props) => {
-    const [iframeSrc, setIframeSrc] = createSignal("");
-    const [base64Data, setBase64Data] = createSignal<string>("");
-    const extensions: string[] = [];
-    for (const ext of props.filesPath!) extensions.push(ext);
-    async function getSrc() {
-        const binaryData = await readBinaryFile(`${props.filesPath}`);
-        setBase64Data(btoa(String.fromCharCode(...binaryData)));
-        console.log(base64Data)
-    }
-    getSrc();
-
-    return (
-        <div>
-            {base64Data() && (
-                <iframe src={`data:application/octet-stream;base64,${base64Data()}`} width="100%" height="500"></iframe>
-            )}
-            <img src={`data:image/svg+xml;base64,${base64Data()}`} alt=""/>
-        </div>
-    );
-
-};
+// const FilePreview: Component<FileTypes> = (props) => {
+//     const [iframeUrl, setIframeUrl] = createSignal<string>();
+//
+//
+//     onMount(async () => {
+//         let mimeType = await getMimeType(`${props.filesPath}`);
+//         // console.log("Mime: " + mimeType);
+//
+//         if (allowedMimeTypes.includes(mimeType)) {
+//             const fileSize = await invoke<string>('get_file_size', {filePath: `${props.filesPath}`});
+//             console.log(`File size: ${fileSize}`);
+//             if (parseInt(fileSize) <= maximumSize) {
+//
+//                 const binaryData: Uint8Array = await readBinaryFile(`${props.filesPath}`);
+//                 const blob = new Blob([binaryData], {type: mimeType});
+//
+//                 setIframeUrl(prevURL => URL.createObjectURL(blob));
+//
+//                 // const extension = `${props.filesPath}`.split('.').pop()!;
+//                 // console.log(extension);
+//             } else {
+//                 toast.error(`Oops! File is to big.`, {style: {"font-size": "1.4rem"}});
+//             }
+//         } else {
+//             toast.error(`Oops! Unable to preview file: ${props.filesPath}`, {style: {"font-size": "1.4rem"}});
+//         }
+//     });
+//
+//     async function getMimeType(filePath: string): Promise<string> {
+//         try {
+//             const mimeType = await invoke<string>('get_mime_type', {filePath: `${props.filesPath}`});
+//             return mimeType;
+//         } catch (error) {
+//             console.error('Error getting MIME type:', error);
+//             throw error;
+//         }
+//     }
+//
+//
+//     return (
+//         <div>
+//             {iframeUrl() && (
+//                 <>
+//                     <iframe src={iframeUrl()} width="100%" height="500"></iframe>
+//                 </>
+//             )}
+//         </div>
+//     );
+// };
 
 
 const FileField: ParentComponent<FieldOptions> = (props) => {
@@ -52,24 +86,54 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
     const [element, setElement] = createSignal<HTMLElement>();
     const pressing = createKeyHold("Escape", {preventDefault: false});
     const [files, setFiles] = createSignal<null | string | string[]>();
+    const [iframes, setIframes] = createSignal<JSX.Element[]>([]);
 
     createEffect(() => {
         if (pressing()) closeSubSettings(element());
     });
 
+    const checkFile = async (filePath: string) => {
 
-    // function handleFileInputChange(event: Event) {
-    //     console.log("This");
-    //     const input = event.target as HTMLInputElement;
-    //     const selectedFile = input.files && input.files[0];
-    //
-    //     if (selectedFile) {
-    //         setFile(() => selectedFile);
-    //         console.log(file()!.name);
-    //     }
-    // }
+        let mimeType = await getMimeType(filePath);
+        // console.log("Mime: " + mimeType);
 
+        if (allowedMimeTypes.includes(mimeType)) {
+            const fileSize = await invoke<string>('get_file_size', {filePath: filePath});
+            console.log(`File size: ${fileSize}`);
+            if (parseInt(fileSize) <= maximumSize) {
+
+                const binaryData: Uint8Array = await readBinaryFile(filePath);
+                const blob = new Blob([binaryData], {type: mimeType});
+
+                // setIframeUrl(prevURL => URL.createObjectURL(blob));
+                const newIframe = <iframe src={URL.createObjectURL(blob)} width="100%" height="500"></iframe>;
+                setIframes(prevIframes => [...prevIframes, newIframe]);
+
+
+                // const extension = `${props.filesPath}`.split('.').pop()!;
+                // console.log(extension);
+            } else {
+                toast.error(`Oops! File is to big.`, {style: {"font-size": "1.4rem"}});
+            }
+        } else {
+            toast.error(`Oops! Unable to preview file: ${files()}`, {style: {"font-size": "1.4rem"}});
+        }
+    }
+
+    async function getMimeType(filePath: string): Promise<string> {
+        try {
+            const mimeType = await invoke<string>('get_mime_type', {filePath: filePath});
+            return mimeType;
+        } catch (error) {
+            console.error('Error getting MIME type:', error);
+            throw error;
+        }
+    }
+
+    ////////////////////////////////////////////////////
     async function openFile() {
+        setFiles(null);
+        setIframes([]);
         let selected: null | string | string[];
 
         if (props.fieldType === "files") {
@@ -85,27 +149,26 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
         if (Array.isArray(selected)) {
             // user selected multiple directories
             console.log(`user selected multiple directories`);
-            console.log(selected);
+            for (const filePath of selected) checkFile(filePath);
         } else if (selected === null) {
             // user cancelled the selection
             console.log(`user cancelled the selection`);
-            console.log(selected);
         } else {
             // user selected a single directory
             console.log(`user selected a single directory`);
-            console.log(selected);
+            checkFile(selected);
         }
-    }
 
+    }
 
     return (
         <div class={files() || props.children ? "form__field customizable" : "form__field"} ref={setElement}>
             <InputFieldDescription {...props}/>
             <div id={props.htmlID} class="form__field-input cur-pointer" title={props.content} onClick={openFile}>
                 {/*{files() ? `Selected file: ${files()}` : props.content}*/}
-                {files() ? `${files()}` : props.content}
+                {files() ? (files()?.length! <= 1 ? `${files()}` : `${files()?.length} files have been selected`) : props.content}
             </div>
-            {(files() || props.children) && (
+            {(files() && iframes() || props.children) && (
                 <>
                     <span class="form__field-label settings active" onClick={() => openSubSettings(element())}>
                         <span class="svg settings-v2"></span>
@@ -116,7 +179,16 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
                                 <span class="burger__span"></span>
                             </div>
                         </div>
-                        {files() ? <FilePreview filesPath={files()!} /> : props.content}
+                        {/*{files() && <FilePreview filesPath={files()!} allowedType={props.fieldType}/>}*/}
+                        {iframes() &&
+                            <ul>
+                                <For each={iframes()}>{(frame) =>
+                                    <li>
+                                        {frame}
+                                    </li>
+                                }</For>
+                            </ul>
+                        }
                         <br/><br/><br/><br/><br/><br/><br/><br/>
                         {props.children}
                     </div>

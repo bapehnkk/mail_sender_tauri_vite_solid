@@ -62,7 +62,7 @@ export default function HomeScreen() {
                         htmlID={"choose-file"}
                         fieldType={"file"}
                         content={"Choose file:"}
-                    ></Field>
+                    >content</Field>
                     <Field
                         svg={"upload"}
                         htmlID={"choose-files"}

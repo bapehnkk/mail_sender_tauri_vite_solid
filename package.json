@@ -13,6 +13,7 @@
   "devDependencies": {
     "@suid/vite-plugin": "0.1.2",
     "@tauri-apps/cli": "^1.2.2",
+    "@types/mime-types": "^2.1.1",
     "@types/node": "^18.7.10",
     "autoprefixer": "^10.4.13",
     "postcss": "^8.4.21",
@@ -29,10 +30,14 @@
     "@solidjs/router": "^0.7.0",
     "@suid/material": "0.10.2",
     "@tauri-apps/api": "^1.2.0",
+    "@types/file-type": "^10.9.1",
+    "@types/mmmagic": "^0.4.30",
+    "file-type": "^18.2.1",
     "filepond": "^4.30.4",
     "solid-icons": "^1.0.4",
     "solid-js": "^1.4.7",
     "solid-js-form": "^0.1.8",
+    "solid-toast": "^0.4.0",
     "solid-transition-group": "^0.0.13"
   }
 }
