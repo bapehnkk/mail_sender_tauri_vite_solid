@@ -633,7 +633,6 @@ header .links a.ripple:active .svg:active {
   background-color: var(--gray);
   left: 0;
   top: 0;
-  clip-path: circle(0rem at 50% 20rem);
   transition: all;
   transition-duration: 0.4s;
   display: flex;
@@ -646,7 +645,6 @@ header .links a.ripple:active .svg:active {
 }
 .form__field-settings.open {
   opacity: 1;
-  clip-path: circle(70.7% at 50% 50%) !important;
 }
 .form__field-settings__close {
   position: absolute;

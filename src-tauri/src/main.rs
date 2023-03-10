@@ -3,6 +3,8 @@ all(not(debug_assertions), target_os = "windows"),
 windows_subsystem = "windows"
 )]
 
+mod send_mail;
+
 use std::fs;
 use mime_guess::MimeGuess;
 
@@ -30,10 +32,21 @@ fn get_file_size(file_path: &str) -> Result<serde_json::Value, tauri::Error> {
 }
 
 
+#[tauri::command]
+async fn send_smtp_mail() {
+    match send_mail::main().await {
+        Ok(_) => println!("Email sent successfully"),
+        Err(e) => eprintln!("Error sending email: {}", e),
+    }
+}
+
+
+
+
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet, get_mime_type, get_file_size])
+        .invoke_handler(tauri::generate_handler![greet, get_mime_type, get_file_size, send_smtp_mail])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

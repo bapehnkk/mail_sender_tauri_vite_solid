@@ -18,6 +18,10 @@ serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "1.2", features = ["api-all"] }
 mime_guess = "2.0.3"
 
+tokio = { version = "1", features = ["full"] }
+lettre = { version = "0.10.0-beta.2", default-features = false, features = ["smtp-transport", "tokio1-rustls-tls", "hostname", "r2d2", "builder"] }
+
+
 
 
 [features]

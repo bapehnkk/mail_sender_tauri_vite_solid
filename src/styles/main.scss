@@ -400,7 +400,7 @@ body {
             background-color: var(--gray);
             left: 0;
             top: 0;
-            clip-path: circle(0rem at 50% 20rem);
+            //clip-path: circle(0rem at 50% 20rem);
             transition: all;
             transition-duration: 0.4s;
             display: flex;
@@ -413,7 +413,7 @@ body {
 
             &.open {
                 opacity: 1;
-                clip-path: circle(70.7% at 50% 50%) !important;
+                //clip-path: circle(70.7% at 50% 50%) !important;
             }
 
             &__close {

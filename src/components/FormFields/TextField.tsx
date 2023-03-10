@@ -31,7 +31,7 @@ const TextField: ParentComponent<FieldOptions> = (props) => {
                 <span class="form__field-label settings active" onClick={() => openSubSettings(element())}>
                     <span class="svg settings-v2"></span>
                 </span>
-                <div class={"form__field-settings"}>
+                <div class={"form__field-settings none"}>
                     <div class="form__field-settings__close ">
                         <div class="burger active" onClick={() => closeSubSettings(element())}>
                             <span class="burger__span"></span>

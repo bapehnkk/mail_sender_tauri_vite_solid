@@ -1,16 +1,32 @@
-import { Component } from "solid-js";
 import {Link} from "@solidjs/router";
 import {Button} from "@suid/material";
+import {Component, createEffect} from 'solid-js';
 
-const HomeScreen: Component = () => {
+import {createSignal, onMount} from 'solid-js';
+import {listen} from '@tauri-apps/api/event';
+import {invoke} from '@tauri-apps/api/tauri';
 
-  return (
-      <div class={"container"}>
-          <Link href={"/"}>
-            <Button>Settings Page</Button>
-          </Link>
-      </div>
-  );
+
+const SettingsScreen: Component = () => {
+
+    const sendMail = ()=>{
+
+        invoke('send_smtp_mail').then(() => console.log('Completed!'))
+    };
+
+
+    return (
+        <div style="display: grid; grid-template-columns: auto auto;">
+            <div style="grid-column: span 2; grid-row: 1;">
+                <label for="input" style="display: block;">Message</label>
+                <input id="input" v-model="output"/>
+                <br/>
+                <button
+                    onclick={sendMail}>Send to Mail
+                </button>
+            </div>
+        </div>
+    );
 };
 
-export default HomeScreen;
+export default SettingsScreen;

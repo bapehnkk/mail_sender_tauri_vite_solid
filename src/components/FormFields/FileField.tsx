@@ -1,6 +1,5 @@
-import {createEffect, ParentComponent, Component, onMount, JSX} from "solid-js";
+import {createEffect, ParentComponent, Component, onMount, JSX, createSignal, For} from "solid-js";
 import {FieldOptions} from "../FormField";
-import {createSignal, For} from "solid-js";
 import {createKeyHold} from "@solid-primitives/keyboard";
 import InputFieldDescription from "./InputFieldDescription";
 import {openSubSettings, closeSubSettings} from "../FormField";
@@ -27,7 +26,8 @@ const allowedMimeTypes = [
     // image
     "image/apng", "image/avif", "image/gif", "image/jpeg", "image/png", "image/svg+xml", "image/webp",
     // audio/video
-    "audio/wave", "audio/wav", "audio/x-wav", "audio/x-pn-wav", "audio/webm", "video/webm", "audio/ogg", "video/ogg", "application/ogg"
+    "audio/wave", "audio/wav", "audio/x-wav", "audio/x-pn-wav", "audio/webm", "video/webm", "audio/ogg", "video/ogg", "application/ogg",
+    "audio/mp4", "video/mp4", "application/mp4"
 ];
 
 // const FilePreview: Component<FileTypes> = (props) => {
@@ -80,13 +80,22 @@ const allowedMimeTypes = [
 //     );
 // };
 
+interface Previews {
+    iframe: JSX.Element,
+    size: number,
+    name: string
+}
 
 const FileField: ParentComponent<FieldOptions> = (props) => {
 
     const [element, setElement] = createSignal<HTMLElement>();
     const pressing = createKeyHold("Escape", {preventDefault: false});
     const [files, setFiles] = createSignal<null | string | string[]>();
-    const [iframes, setIframes] = createSignal<JSX.Element[]>([]);
+    const [iframes, setIframes] = createSignal<Previews[]>([]);
+
+
+
+
 
     createEffect(() => {
         if (pressing()) closeSubSettings(element());
@@ -107,7 +116,12 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
 
                 // setIframeUrl(prevURL => URL.createObjectURL(blob));
                 const newIframe = <iframe src={URL.createObjectURL(blob)} width="100%" height="500"></iframe>;
-                setIframes(prevIframes => [...prevIframes, newIframe]);
+                // setIframes(prevIframes => [...prevIframes, newIframe]);
+                setIframes(prevIframes => [...prevIframes, {
+                    iframe: newIframe,
+                    size: parseInt(fileSize),
+                    name: filePath
+                }]);
 
 
                 // const extension = `${props.filesPath}`.split('.').pop()!;
@@ -161,6 +175,7 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
 
     }
 
+
     return (
         <div class={files() || props.children ? "form__field customizable" : "form__field"} ref={setElement}>
             <InputFieldDescription {...props}/>
@@ -173,7 +188,7 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
                     <span class="form__field-label settings active" onClick={() => openSubSettings(element())}>
                         <span class="svg settings-v2"></span>
                     </span>
-                    <div class={"form__field-settings"}>
+                    <div class={"form__field-settings none"}>
                         <div class="form__field-settings__close">
                             <div class="burger active" onClick={() => closeSubSettings(element())}>
                                 <span class="burger__span"></span>
@@ -181,10 +196,24 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
                         </div>
                         {/*{files() && <FilePreview filesPath={files()!} allowedType={props.fieldType}/>}*/}
                         {iframes() &&
-                            <ul>
-                                <For each={iframes()}>{(frame) =>
+                            <ul class="selected-files">
+                                <For each={iframes()}>{(preview, i) =>
                                     <li>
-                                        {frame}
+                                        <table>
+                                            <tbody>
+                                            <tr>
+                                                <td>{i() + 1}.</td>
+                                                <td>Name</td>
+                                                <td>Size</td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>{preview.name}</td>
+                                                <td>{Math.ceil(preview.size / 1024).toString().replace(/\d{1,3}(?=(\d{3})+(?!\d))/g, "$& ")}kb</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        {preview.iframe}
                                     </li>
                                 }</For>
                             </ul>

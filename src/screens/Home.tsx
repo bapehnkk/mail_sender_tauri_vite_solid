@@ -110,7 +110,7 @@ export default function HomeScreen() {
                     <span class="form__field-label settings">
                         <span class="svg settings-v2"></span>
                     </span>
-                    <div class="form__field-settings">
+                    <div class="form__field-settings none">
                         <div class="form__field-settings__close ">
                             <div class="burger active">
                                 <span class="burger__span"></span>
@@ -146,7 +146,7 @@ export default function HomeScreen() {
                     <span class="form__field-label settings">
                         <span class="svg settings-v2"></span>
                     </span>
-                    <div class="form__field-settings">
+                    <div class="form__field-settings none">
                         <div class="form__field-settings__close ">
                             <div class="burger active">
                                 <span class="burger__span"></span>
@@ -210,7 +210,7 @@ export default function HomeScreen() {
                     <span class="form__field-label settings">
                         <span class="svg settings-v2 visibility"></span>
                     </span>
-                    <div class="form__field-settings">
+                    <div class="form__field-settings none">
                         <div class="form__field-settings__close ">
                             <div class="burger active">
                                 <span class="burger__span"></span>
@@ -239,7 +239,7 @@ export default function HomeScreen() {
                     <span class="form__field-label settings">
                         <span class="svg settings-v2"></span>
                     </span>
-                    <div class="form__field-settings">
+                    <div class="form__field-settings none">
                         <div class="form__field-settings__close ">
                             <div class="burger active">
                                 <span class="burger__span"></span>
