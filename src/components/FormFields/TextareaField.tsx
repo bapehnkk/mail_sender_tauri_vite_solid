@@ -18,13 +18,14 @@ const TextareaField: ParentComponent<FieldOptions> = (props) => {
     return (
         <div class="form__field customizable textarea" ref={setElement}>
             <textarea
-                id="mail-text"
+                id={props.htmlID}
+                placeholder={props.content}
+                title={props.content}
+                autocomplete="off"
                 class="form__field-input"
                 name=""
                 cols="30"
                 rows="10"
-                placeholder="Mail text"
-                title="Mail text"
             ></textarea>
             <span class="form__field-label settings active" onClick={() => openSubSettings(element())}>
                 <span class="svg settings-v2"></span>

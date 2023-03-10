@@ -9,10 +9,32 @@ import {invoke} from '@tauri-apps/api/tauri';
 
 const SettingsScreen: Component = () => {
 
-    const sendMail = ()=>{
 
-        invoke('send_smtp_mail').then(() => console.log('Completed!'))
-    };
+    async function sendMail() {
+        const mailFields = {
+            sendersName: 'John Doe',
+            title: 'My email',
+            recipientsName: 'Jane Smith',
+            text: 'Hello Jane, how are you?',
+            files: ['attachment1.txt', 'attachment2.txt'],
+        };
+
+        // console.log(MailFields);
+
+        invoke('send_smtp_mail', mailFields)
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+
+    }
+
+
+    // const sendMail = () => {
+    //     invoke('send_smtp_mail').then(() => console.log('Completed!'));
+    // };
 
 
     return (

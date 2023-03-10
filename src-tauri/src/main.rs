@@ -9,6 +9,7 @@ use std::fs;
 use mime_guess::MimeGuess;
 
 
+
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -32,13 +33,32 @@ fn get_file_size(file_path: &str) -> Result<serde_json::Value, tauri::Error> {
 }
 
 
+
+
+
 #[tauri::command]
-async fn send_smtp_mail() {
-    match send_mail::main().await {
+async fn send_smtp_mail(
+    senders_name: String,
+    title: String,
+    recipients_name: String,
+    text: String,
+    files: Vec<String>
+) {
+
+    println!("senders_name: {senders_name}");
+    println!("title: {title}");
+    println!("recipients_name: {recipients_name}");
+    println!("text: {text}");
+    println!("files: {:?}", files);
+
+    // Send email using the data in mail_fields
+
+     match send_mail::main(senders_name, title, recipients_name, text, files).await {
         Ok(_) => println!("Email sent successfully"),
         Err(e) => eprintln!("Error sending email: {}", e),
     }
 }
+
 
 
 

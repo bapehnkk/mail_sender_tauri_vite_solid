@@ -1,21 +1,59 @@
-import {
-    createForm,
-    email,
-    Form,
-    minLength,
-    required,
-} from '@modular-forms/solid';
-import {Typography} from "@suid/material";
 import Field from "../components/FormField"
+import {createEffect, createSignal} from 'solid-js';
+import {invoke} from "@tauri-apps/api/tauri";
 
-type LoginForm = {
-    email: string;
-    password: string;
-};
+import toast from 'solid-toast';
+
+type mailFields = {
+    sendersName: string,
+    title: string,
+    recipientsName: string,
+    text: string,
+    files: string[],
+}
 
 export default function HomeScreen() {
-    // Create login form
-    const loginForm = createForm<LoginForm>();
+    const [title, setTitle] = createSignal("");
+
+
+    async function sendMail() {
+        const getElValue = (id: string): string => {
+            const input = document.getElementById(id) as HTMLInputElement | null;
+            return input!.value;
+        };
+
+        const mailFields = {
+            sendersName: getElValue("sender-name") ,
+            title: getElValue("mail-title"),
+            recipientsName: getElValue("recipients-name"),
+            text: getElValue("mail-text"),
+            files: ['attachment1.txt', 'attachment2.txt'],
+        };
+
+        // console.log(MailFields);
+
+        invoke('send_smtp_mail', mailFields)
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+
+    }
+    async function greet() {
+        const input = document.getElementById('title') as HTMLInputElement | null;
+        const value: string = input!.value;
+        console.log(value); // 👉️ "Initial value"
+
+        const ret: string = await invoke("greet", {name: value});
+        setTitle(ret);
+        console.log(title());
+    }
+
+    createEffect(() => {
+        toast.success(title())
+    });
 
     return (
         <div class={"container"}>
@@ -27,9 +65,10 @@ export default function HomeScreen() {
                     content={"Sender's name"}
                 ></Field>
 
+
                 <Field
                     svg={"title"}
-                    htmlID={"title"}
+                    htmlID={"mail-title"}
                     fieldType={"text"}
                     content={"Mail title"}
                     description={"Write [name] or [surname] and select Excel column name if you want to personalize the email"}
@@ -52,9 +91,9 @@ export default function HomeScreen() {
                 ></Field>
 
                 <Field
-                    htmlID={"recipients-name"}
+                    htmlID={"mail-text"}
                     fieldType={"textarea"}
-                    content={"Recipient's name"}
+                    content={"Mail text"}
                     description={"Select the column corresponding to the name of the recipient of the letter in Excel"}
                 >
                     <Field
@@ -158,7 +197,7 @@ export default function HomeScreen() {
                             <label class="form__field-label cur-help">
                                 <span class="svg html"></span>
                                 <div class="form__field-description">
-                                    Create a mail template from .html file
+                                        Create a mail template from .html file
                                 </div>
                             </label>
                             <label for="choose-html" class="form__field-input sub cur-pointer">
@@ -263,7 +302,7 @@ export default function HomeScreen() {
 
 
                 <div class="form__field">
-                    <button type="submit" class="form__field-submit" value="Send">
+                    <button onclick={sendMail} class="form__field-submit" value="Send">
                         Send
                         <span class="svg send_mail"></span>
                     </button>

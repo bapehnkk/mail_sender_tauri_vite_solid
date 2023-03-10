@@ -3,28 +3,32 @@ use lettre::{
     Tokio1Executor,
 };
 
-pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
+pub async fn main(
+    senders_name: String,
+    title: String,
+    recipients_name: String,
+    text: String,
+    files: Vec<String>,
+) -> Result<(), Box<dyn std::error::Error>> {
     let smtp_credentials =
-        Credentials::new("email".to_string(), "pass".to_string());
+        Credentials::new("elmeo@elmeo.eu".to_string(), "v3Karberi2K8D".to_string());
 
-    let mailer = AsyncSmtpTransport::<Tokio1Executor>::builder_dangerous("server")
+    let mailer = AsyncSmtpTransport::<Tokio1Executor>::builder_dangerous("jet.digisoov.ee")
         .credentials(smtp_credentials)
         .build();
 
 
-    let from = "Hello World <email>";
-    let to = "42 <example@gmail.com>";
-    let subject = "Hello World";
-    let body = "<h1>Hello World</h1>".to_string();
+    let from = format!("{senders_name} <elmeo@elmeo.eu>").to_string();
+    let to = format!("{recipients_name} <bapehnkk@gmail.com>").to_string();
 
-    send_email_smtp(&mailer, from, to, subject, body).await
+    send_email_smtp(&mailer, from, to, title, text).await
 }
 
 async fn send_email_smtp(
     mailer: &AsyncSmtpTransport<Tokio1Executor>,
-    from: &str,
-    to: &str,
-    subject: &str,
+    from: String,
+    to: String,
+    subject: String,
     body: String,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let email = Message::builder()
