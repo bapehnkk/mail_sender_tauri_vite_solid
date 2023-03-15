@@ -4,10 +4,10 @@ windows_subsystem = "windows"
 )]
 
 mod send_mail;
+mod file_handler;
 
 use std::fs;
 use mime_guess::MimeGuess;
-
 
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
@@ -33,7 +33,20 @@ fn get_file_size(file_path: &str) -> Result<serde_json::Value, tauri::Error> {
 }
 
 
-
+#[tauri::command]
+fn read_excel() {
+    let file_path = String::from(r"C:\Users\User\Desktop\sspisok jur (karberi 18) 2022.xlsx");
+    let email_columns = vec![String::from("EMail"), String::from("E-Mail")];
+    let name_columns = vec![String::from("Имя"), String::from("Name")];
+    let surname_columns = vec![String::from("Фамилия"), String::from("Surname")];
+    let result = file_handler::read_excel_with_email(
+        file_path,
+        &email_columns,
+        &name_columns,
+        &surname_columns,
+    );
+    println!("{:#?}", result);
+}
 
 
 #[tauri::command]
@@ -42,9 +55,8 @@ async fn send_smtp_mail(
     title: String,
     recipients_name: String,
     text: String,
-    files: Vec<String>
+    files: Vec<String>,
 ) {
-
     println!("senders_name: {senders_name}");
     println!("title: {title}");
     println!("recipients_name: {recipients_name}");
@@ -53,20 +65,16 @@ async fn send_smtp_mail(
 
     // Send email using the data in mail_fields
 
-     match send_mail::main(senders_name, title, recipients_name, text, files).await {
+    match send_mail::main(senders_name, title, recipients_name, text, files).await {
         Ok(_) => println!("Email sent successfully"),
         Err(e) => eprintln!("Error sending email: {}", e),
     }
 }
 
 
-
-
-
-
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet, get_mime_type, get_file_size, send_smtp_mail])
+        .invoke_handler(tauri::generate_handler![greet, get_mime_type, get_file_size, send_smtp_mail, read_excel])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

@@ -10,21 +10,8 @@ import {invoke} from '@tauri-apps/api/tauri';
 const SettingsScreen: Component = () => {
 
 
-    async function sendMail() {
-        const mailFields = {
-            sendersName: 'John Doe',
-            title: 'My email',
-            recipientsName: 'Jane Smith',
-            text: 'Hello Jane, how are you?',
-            files: ['attachment1.txt', 'attachment2.txt'],
-        };
-
-        // console.log(MailFields);
-
-        invoke('send_smtp_mail', mailFields)
-            .then((response) => {
-                console.log(response);
-            })
+    async function readExcel() {
+        invoke('read_excel')
             .catch((error) => {
                 console.error(error);
             });
@@ -44,7 +31,7 @@ const SettingsScreen: Component = () => {
                 <input id="input" v-model="output"/>
                 <br/>
                 <button
-                    onclick={sendMail}>Send to Mail
+                    onclick={readExcel}>Send to Mail
                 </button>
             </div>
         </div>
