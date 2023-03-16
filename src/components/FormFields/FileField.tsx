@@ -10,6 +10,7 @@ import {readBinaryFile, readTextFile} from '@tauri-apps/api/fs';
 import {invoke} from '@tauri-apps/api/tauri';
 
 import toast from 'solid-toast';
+import ExcelSelect from "./ExcelSelect";
 
 
 const maximumSize = 20 * 1024 * 1024; // 20mb
@@ -204,6 +205,8 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
     }
 
 
+
+
     return (
         <div class={files() || props.children ? "form__field customizable" : "form__field"} ref={setElement}>
             <InputFieldDescription {...props}/>
@@ -247,23 +250,7 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
                             </ul>
                         }
                         {cells() &&
-                            <>
-                                <div class="select-columns">
-                                    <For each={cells()}>{(cell, i) =>
-                                        <div class="select-columns__column">
-                                            <div class="select-columns__column-name">{cell}</div>
-                                            <div class="select-columns__select">
-                                                <select size="{i() + 1}">
-                                                    <option value="">Select an option</option>
-                                                    <option value="1">E-mail</option>
-                                                    <option value="2">Name</option>
-                                                    <option value="3">Surname</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    }</For>
-                                </div>
-                            </>
+                                <ExcelSelect cells={cells()}/>
                         }
                         <br/><br/><br/><br/><br/><br/><br/><br/>
                         {props.children}
