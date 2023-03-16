@@ -29,6 +29,14 @@ const allowedMimeTypes = [
     "audio/wave", "audio/wav", "audio/x-wav", "audio/x-pn-wav", "audio/webm", "video/webm", "audio/ogg", "video/ogg", "application/ogg",
     "audio/mp4", "video/mp4", "application/mp4"
 ];
+const excelMimeTypes = [
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.ms-excel.sheet.macroEnabled.12",
+    "application/vnd.ms-excel.addin.macroEnabled.12",
+    "application/vnd.ms-excel.template.macroEnabled.12",
+    "application/vnd.ms-excel.sheet.binary.macroEnabled.12"
+]
 
 // const FilePreview: Component<FileTypes> = (props) => {
 //     const [iframeUrl, setIframeUrl] = createSignal<string>();
@@ -93,22 +101,20 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
     const [files, setFiles] = createSignal<null | string | string[]>();
     const [iframes, setIframes] = createSignal<Previews[]>([]);
 
-
-
-
+    const [cells, setCells] = createSignal<string[]>();
 
     createEffect(() => {
         if (pressing()) closeSubSettings(element());
     });
 
     const checkFile = async (filePath: string) => {
-
+        setCells();
         let mimeType = await getMimeType(filePath);
         // console.log("Mime: " + mimeType);
 
         if (allowedMimeTypes.includes(mimeType)) {
             const fileSize = await invoke<string>('get_file_size', {filePath: filePath});
-            console.log(`File size: ${fileSize}`);
+            // console.log(`File size: ${fileSize}`);
             if (parseInt(fileSize) <= maximumSize) {
 
                 const binaryData: Uint8Array = await readBinaryFile(filePath);
@@ -130,7 +136,29 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
                 toast.error(`Oops! File is to big.`, {style: {"font-size": "1.4rem"}});
             }
         } else {
-            toast.error(`Oops! Unable to preview file: ${files()}`, {style: {"font-size": "1.4rem"}});
+            if (excelMimeTypes.includes(mimeType)) {
+                invoke('get_excel_header', {
+                    filePath: filePath
+                })
+                    .then((excelHeader) => {
+                        // console.log(`Header: ${excelHeader}. Type: ${typeof excelHeader}.`);
+
+                        return excelHeader as string[]
+                    })
+                    .then((excelHeader: string[]) => {
+                        if (excelHeader.length <= 0)
+                            throw new Error("An error occurred while reading the file. Try choosing a different file.");
+                        for (let el of excelHeader) {
+                            // console.log(el)
+                        }
+                        setCells(excelHeader);
+                    })
+                    .catch((error) => {
+                        console.error(`Error: ${error}`);
+                    });
+            } else {
+                toast.error(`Oops! Unable to preview file: ${files()}`, {style: {"font-size": "1.4rem"}});
+            }
         }
     }
 
@@ -217,6 +245,25 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
                                     </li>
                                 }</For>
                             </ul>
+                        }
+                        {cells() &&
+                            <>
+                                <div class="select-columns">
+                                    <For each={cells()}>{(cell, i) =>
+                                        <div class="select-columns__column">
+                                            <div class="select-columns__column-name">{cell}</div>
+                                            <div class="select-columns__select">
+                                                <select size="{i() + 1}">
+                                                    <option value="">Select an option</option>
+                                                    <option value="1">E-mail</option>
+                                                    <option value="2">Name</option>
+                                                    <option value="3">Surname</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    }</For>
+                                </div>
+                            </>
                         }
                         <br/><br/><br/><br/><br/><br/><br/><br/>
                         {props.children}

@@ -6,8 +6,11 @@ windows_subsystem = "windows"
 mod send_mail;
 mod file_handler;
 
+use std::fmt::Display;
 use std::fs;
 use mime_guess::MimeGuess;
+
+use serde::Deserialize;
 
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
@@ -34,7 +37,7 @@ fn get_file_size(file_path: &str) -> Result<serde_json::Value, tauri::Error> {
 
 
 #[tauri::command]
-fn read_excel() {
+async fn read_excel() {
     let file_path = String::from(r"C:\Users\User\Desktop\sspisok jur (karberi 18) 2022.xlsx");
     let email_columns = vec![String::from("EMail"), String::from("E-Mail")];
     let name_columns = vec![String::from("Имя"), String::from("Name")];
@@ -47,6 +50,21 @@ fn read_excel() {
     );
     println!("{:#?}", result);
 }
+
+
+/////////////////////////////////////////////////////////////////////////
+
+#[tauri::command]
+fn get_excel_header(file_path: String) -> Vec<String> {
+    match file_handler::get_header(file_path) {
+        Ok(header) => header,
+        Err(e) => {
+            eprintln!("Error: {}", e.to_string());
+            vec![]
+        }
+    }
+}
+
 
 
 #[tauri::command]
@@ -74,7 +92,7 @@ async fn send_smtp_mail(
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet, get_mime_type, get_file_size, send_smtp_mail, read_excel])
+        .invoke_handler(tauri::generate_handler![greet, get_mime_type, get_file_size, send_smtp_mail, read_excel, get_excel_header])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

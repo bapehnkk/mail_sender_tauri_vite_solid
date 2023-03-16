@@ -11,11 +11,31 @@ const SettingsScreen: Component = () => {
 
 
     async function readExcel() {
-        invoke('read_excel')
-            .catch((error) => {
-                console.error(error);
-            });
+        // invoke('read_excel')
+        //     .catch((error) => {
+        //         console.error(error);
+        //     });
 
+
+        invoke('get_excel_header', {
+            filePath: "C:\\Users\\User\\Desktop\\sspisok jur (karberi 18) 2022.xlsx"
+        })
+            .then((excelHeader) => {
+                console.log(`Header: ${excelHeader}. Type: ${typeof excelHeader}.`);
+
+                return excelHeader as string[]
+
+            })
+            .then((excelHeader: string[]) => {
+                if (excelHeader.length <= 0)
+                    throw new Error("An error occurred while reading the file. Try choosing a different file.");
+                for (let el of excelHeader) {
+                    console.log(el)
+                }
+            })
+            .catch((error) => {
+                console.error(`Error: ${error}`);
+            });
     }
 
 

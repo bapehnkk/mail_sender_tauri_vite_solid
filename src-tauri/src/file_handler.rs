@@ -2,6 +2,13 @@ use ndarray::{Array2, Axis};
 use std;
 use calamine::{Reader, open_workbook, Xlsx, DataType};
 use calamine::DataType::Empty;
+use regex::Regex;
+
+
+fn validate_email(email: &str) -> bool {
+    let re = Regex::new(r"^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$").unwrap();
+    re.is_match(email)
+}
 
 
 fn array2_to_vec_of_vec<T: Clone>(arr: &Array2<T>) -> Vec<Vec<T>> {
@@ -15,6 +22,33 @@ pub struct Row {
     emails: Vec<String>,
     names: Vec<String>,
     surnames: Vec<String>,
+}
+
+use std::error::Error;
+
+pub(crate) fn get_header(file_path: String) -> Result<Vec<String>, Box<dyn Error>> {
+    let mut header: Vec<String> = vec![];
+    let mut excel: Xlsx<_> = open_workbook(file_path)?;
+
+    for sheet in excel.sheet_names().to_vec() {
+        if let Some(Ok(r)) = excel.worksheet_range(&sheet) {
+            for row in r.rows() {
+                for cell in row.to_vec() {
+                    if !cell.to_string().is_empty() {
+                        header.push(cell.to_string());
+                    }
+                }
+                break;
+            }
+        }
+        break;
+    }
+
+    if header.is_empty() {
+        return Err("Header not found".into());
+    }
+
+    Ok(header)
 }
 
 
@@ -64,7 +98,10 @@ pub(crate) fn read_excel_with_email(
                     // Как-то надобно сократить эти 3 повторяющихся for loop
                     for id in &email_ids {
                         if !row[*id].to_string().is_empty() {
-                            parse_row.emails.push(row[*id].to_string())
+                            let email = row[*id].to_string();
+                            if validate_email(&email) {
+                                parse_row.emails.push(email)
+                            }
                         }
                     }
                     for id in &name_ids {
@@ -78,12 +115,14 @@ pub(crate) fn read_excel_with_email(
                         }
                     }
 
+                    // если в строке не emails
                     if !parse_row.emails.is_empty() {
                         parse_result.push(parse_row);
                     }
                 }
             }
         }
+        break;
     }
     parse_result
 }
@@ -91,5 +130,4 @@ pub(crate) fn read_excel_with_email(
 fn print_type_of<T>(_: &T) {
     println!("{}", std::any::type_name::<T>())
 }
-
 

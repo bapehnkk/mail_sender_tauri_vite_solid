@@ -1469,6 +1469,7 @@ dependencies = [
  "lettre",
  "mime_guess",
  "ndarray",
+ "regex",
  "serde",
  "serde_json",
  "tauri",

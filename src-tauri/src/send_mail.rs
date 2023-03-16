@@ -3,6 +3,13 @@ use lettre::{
     Tokio1Executor,
 };
 
+use regex::Regex;
+fn validate_email(email: &str) -> bool {
+    let re = Regex::new(r"^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$").unwrap();
+    re.is_match(email)
+}
+
+
 pub async fn main(
     senders_name: String,
     title: String,
