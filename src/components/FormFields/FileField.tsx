@@ -292,7 +292,7 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
                                             </tr>
                                             <tr>
                                                 <td></td>
-                                                <td>{preview.name}</td>
+                                                <td class="fileName">{preview.name}</td>
                                                 <td>
                                                     {Math.ceil(preview.size / 1024).toString().replace(/\d{1,3}(?=(\d{3})+(?!\d))/g, "$& ")}kb
                                                 </td>

@@ -3,6 +3,7 @@ import {createEffect, createSignal} from 'solid-js';
 import {invoke} from "@tauri-apps/api/tauri";
 
 import toast from 'solid-toast';
+import * as querystring from "querystring";
 
 // type mailFields = {
 //     sendersName: string,
@@ -12,9 +13,39 @@ import toast from 'solid-toast';
 //     files: string[],
 // }
 
+interface Selects {
+    selectedEmails: string[],
+    selectedNames: string[],
+    selectedSurnames: string[],
+}
+
+interface Excel {
+    filePath: string,
+    selects: Selects
+}
+
 export default function HomeScreen() {
 
     const [title, setTitle] = createSignal<string>();
+
+    const getSelects = (inputExcel: HTMLElement) => {
+        let selects: Selects = {
+            "selectedEmails": [],
+            "selectedNames": [],
+            "selectedSurnames": [],
+        };
+        inputExcel!.parentElement!.querySelectorAll('select').forEach(elem => {
+            const columnName = elem.parentElement!.parentElement!.querySelector(".select-columns__column-name")!.innerHTML;
+            if (elem.value === '1') {
+                selects["selectedEmails"].push(columnName);
+            } else if (elem.value === '2') {
+                selects["selectedNames"].push(columnName);
+            } else if (elem.value === '3') {
+                selects["selectedSurnames"].push(columnName);
+            }
+        });
+        return selects;
+    };
 
 
     async function sendMail() {
@@ -22,13 +53,23 @@ export default function HomeScreen() {
             const input = document.getElementById(id) as HTMLInputElement | null;
             return input!.value;
         };
+        let files: string[] = Array.from(document.getElementById("choose-files")!.parentElement!.querySelectorAll(".fileName"), fileName => fileName.innerHTML);
+
+        const excel: Excel = {
+            filePath: document.getElementById("choose-excel")!.innerHTML,
+            selects: getSelects(document.getElementById("choose-excel")!)
+        };
 
         const mailFields = {
             sendersName: getElValue("sender-name"),
             title: getElValue("mail-title"),
             recipientsName: getElValue("recipients-name"),
             text: getElValue("mail-text"),
-            files: ['attachment1.txt', 'attachment2.txt'],
+            files: files,
+            filePath: excel.filePath,
+            selectedEmails: excel.selects.selectedEmails,
+            selectedNames: excel.selects.selectedNames,
+            selectedSurnames: excel.selects.selectedSurnames,
         };
 
         // console.log(MailFields);
@@ -158,7 +199,6 @@ export default function HomeScreen() {
                         <span class="svg send_mail"></span>
                     </button>
                 </div>
-
 
 
                 {/*<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>*/}

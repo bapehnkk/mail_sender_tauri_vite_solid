@@ -74,19 +74,27 @@ async fn send_smtp_mail(
     recipients_name: String,
     text: String,
     files: Vec<String>,
+    file_path: String,
+    selected_emails: Vec<String>,
+    selected_names: Vec<String>,
+    selected_surnames: Vec<String>
 ) {
     println!("senders_name: {senders_name}");
     println!("title: {title}");
     println!("recipients_name: {recipients_name}");
     println!("text: {text}");
     println!("files: {:?}", files);
+    println!("file_path: {:?}", file_path);
+    println!("selected_emails: {:?}", selected_emails);
+    println!("selected_names: {:?}", selected_names);
+    println!("selected_surnames: {:?}", selected_surnames);
 
     // Send email using the data in mail_fields
 
-    match send_mail::main(senders_name, title, recipients_name, text, files).await {
-        Ok(_) => println!("Email sent successfully"),
-        Err(e) => eprintln!("Error sending email: {}", e),
-    }
+    // match send_mail::main(senders_name, title, recipients_name, text, files).await {
+    //     Ok(_) => println!("Email sent successfully"),
+    //     Err(e) => eprintln!("Error sending email: {}", e),
+    // }
 }
 
 
