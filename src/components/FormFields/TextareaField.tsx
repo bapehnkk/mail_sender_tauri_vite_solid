@@ -12,7 +12,7 @@ const TextareaField: ParentComponent<FieldOptions> = (props) => {
     const pressing = createKeyHold("Escape", {preventDefault: false});
 
     createEffect(() => {
-        if (pressing()) closeSubSettings(element());
+        if (pressing()) closeSubSettings(element()!);
     });
 
     return (
@@ -27,12 +27,12 @@ const TextareaField: ParentComponent<FieldOptions> = (props) => {
                 cols="30"
                 rows="10"
             ></textarea>
-            <span class="form__field-label settings active" onClick={() => openSubSettings(element())}>
+            <span class="form__field-label settings active" onClick={() => openSubSettings(element()!)}>
                 <span class="svg settings-v2"></span>
             </span>
             <div class={"form__field-settings none"}>
                 <div class="form__field-settings__close ">
-                    <div class="burger active" onClick={() => closeSubSettings(element())}>
+                    <div class="burger active" onClick={() => closeSubSettings(element()!)}>
                         <span class="burger__span"></span>
                     </div>
                 </div>

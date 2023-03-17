@@ -29,16 +29,32 @@ use std::error::Error;
 pub(crate) fn get_header(file_path: String) -> Result<Vec<String>, Box<dyn Error>> {
     let mut header: Vec<String> = vec![];
     let mut excel: Xlsx<_> = open_workbook(file_path)?;
+    let mut have_an_email: bool = false;
 
     for sheet in excel.sheet_names().to_vec() {
         if let Some(Ok(r)) = excel.worksheet_range(&sheet) {
-            for row in r.rows() {
-                for cell in row.to_vec() {
-                    if !cell.to_string().is_empty() {
-                        header.push(cell.to_string());
+            for (i, row) in r.rows().enumerate() {
+                if have_an_email {
+                    break;
+                }
+                if i == 0 {
+                    for cell in row.to_vec() {
+                        if !cell.to_string().is_empty() {
+                            header.push(cell.to_string());
+                        }
+                    }
+                } else {
+                    for cell in row.to_vec() {
+                        if have_an_email {
+                            break;
+                        }
+                        if !cell.to_string().is_empty() {
+                            if validate_email(&cell.to_string()) {
+                                have_an_email = true;
+                            }
+                        }
                     }
                 }
-                break;
             }
         }
         break;
@@ -46,6 +62,9 @@ pub(crate) fn get_header(file_path: String) -> Result<Vec<String>, Box<dyn Error
 
     if header.is_empty() {
         return Err("Header not found".into());
+    }
+    if !have_an_email {
+        return Err("I don't have any email!".into());
     }
 
     Ok(header)
@@ -88,8 +107,7 @@ pub(crate) fn read_excel_with_email(
                             }
                         }
                     }
-                }
-                if i != 0 {
+                } else {
                     let mut parse_row: Row = Row {
                         emails: vec![],
                         names: vec![],

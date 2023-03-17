@@ -5,6 +5,7 @@ import {Component, createEffect} from 'solid-js';
 import {createSignal, onMount} from 'solid-js';
 import {listen} from '@tauri-apps/api/event';
 import {invoke} from '@tauri-apps/api/tauri';
+import Field from "../components/FormField";
 
 
 const SettingsScreen: Component = () => {
@@ -45,14 +46,55 @@ const SettingsScreen: Component = () => {
 
 
     return (
-        <div style="display: grid; grid-template-columns: auto auto;">
-            <div style="grid-column: span 2; grid-row: 1;">
-                <label for="input" style="display: block;">Message</label>
-                <input id="input" v-model="output"/>
-                <br/>
-                <button
-                    onclick={readExcel}>Send to Mail
-                </button>
+        <div class={"container"}>
+            <div class="form">
+                <Field
+                    svg={"contact-email"}
+                    htmlID={"email"}
+                    fieldType={"text"}
+                    content={"Email*"}
+                ></Field>
+                <Field
+                    svg={"password"}
+                    htmlID={"password"}
+                    fieldType={"text"}
+                    content={"Password*"}
+                ></Field>
+                <Field
+                    svg={"server"}
+                    htmlID={"server"}
+                    fieldType={"text"}
+                    content={"Server*"}
+                    description={{
+                        description: "smtp.gmail.com"
+                    }}
+                ></Field>
+                <Field
+                    svg={"port"}
+                    htmlID={"port"}
+                    fieldType={"text"}
+                    content={"Port*"}
+                    description={{
+                        description: "465"
+                    }}
+                ></Field>
+                <Field
+                    svg={"sender"}
+                    htmlID={"sender-name"}
+                    fieldType={"text"}
+                    content={"Convertio API key"}
+                    description={{
+                        description: "How to obtain an API key?",
+                        link: "https://support.convertio.co/hc/en-us/articles/360006894493-How-to-obtain-an-API-key-"
+                    }}
+                ></Field>
+
+
+                <div class="form__field">
+                    <button class="form__field-submit" value="Send">
+                        Save
+                    </button>
+                </div>
             </div>
         </div>
     );

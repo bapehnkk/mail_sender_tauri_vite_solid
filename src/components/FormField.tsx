@@ -2,36 +2,42 @@ import {Component, createSignal, JSX, ParentComponent} from "solid-js";
 import TextField from "./FormFields/TextField";
 import TextareaField from "./FormFields/TextareaField";
 import FileField from "./FormFields/FileField";
+import SubmitBtn from "./FormFields/SubmitBtn";
+import CheckboxField from "./FormFields/CheckboxField";
 
-const openSubSettings = (element?: HTMLElement) => {
+const openSubSettings = (element: HTMLElement) => {
     // console.log("opening");
     if (element) {
-        element.querySelector('.form__field-settings')!.classList.remove('none');
+        element.querySelector('.form__field-settings')?.classList.remove('none');
         setTimeout(() => {
-            element.querySelector('.form__field-settings')!.classList.add('open');
+            element.querySelector('.form__field-settings')?.classList.add('open');
             setTimeout(() => {
-                const height = (element.querySelector('.form__field-settings.open') as HTMLElement).offsetHeight;
-                console.log("Height: " + height);
+                const height = (element.querySelector('.form__field-settings.open') as HTMLElement)?.offsetHeight;
+                // console.log("Height: " + height);
                 // (element.querySelector('.form__field-settings.open') as HTMLElement)!.style.height = `${height}px`;
             }, 1000)
         }, 10);
     }
 };
 
-const closeSubSettings = (element?: HTMLElement) => {
+const closeSubSettings = (element: HTMLElement) => {
     // console.log("closing");
-        element!.querySelector('.form__field-settings')!.classList.remove('open');
+        element.querySelector('.form__field-settings')?.classList.remove('open');
         setTimeout(() => {
-            element!.querySelector('.form__field-settings')!.classList.add('none');
+            element.querySelector('.form__field-settings')?.classList.add('none');
         }, 300);
 };
+interface DescriptionOptions {
+    description: string,
+    link?: string
+}
 
-export type FieldOptions = {
-    fieldType: "text" | "password" | "email" | "excel" | "pdf" | "html" | "file" | "files" | "textarea" | "checkbox",
+export interface  FieldOptions {
+    fieldType: "text" | "password" | "email" | "excel" | "pdf" | "html" | "file" | "files" | "textarea" | "checkbox" | "submit",
     htmlID: string,
     svg?: string,
     content?: string,
-    description?: string
+    description?: DescriptionOptions
 }
 
 interface FieldTypes {
@@ -52,7 +58,9 @@ const getFieldComponent = (props: FieldOptions): JSX.Element => {
         file: <FileField {...props}></FileField>,
         files: <FileField {...props}></FileField>,
 
-        checkbox: <TextField {...props}></TextField>
+        checkbox: <CheckboxField {...props}></CheckboxField>,
+
+        submit: <SubmitBtn {...props}></SubmitBtn>
     });
 
     return fieldComponents()[props.fieldType];

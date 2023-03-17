@@ -7,7 +7,7 @@
     "withGlobalTauri": true
   },
   "package": {
-    "productName": "mail_sender_tauri_vite_solid",
+    "productName": "MailSender",
     "version": "0.0.0"
   },
   "tauri": {
@@ -70,7 +70,7 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "mail_sender_tauri_vite_solid",
+        "title": "MailSender",
         "width": 800
       }
     ]

@@ -105,11 +105,10 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
     const [cells, setCells] = createSignal<string[]>();
 
     createEffect(() => {
-        if (pressing()) closeSubSettings(element());
+        if (pressing()) closeSubSettings(element()!);
     });
 
     const checkFile = async (filePath: string) => {
-        setCells();
         let mimeType = await getMimeType(filePath);
         // console.log("Mime: " + mimeType);
 
@@ -137,7 +136,7 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
                 toast.error(`Oops! File is to big.`, {style: {"font-size": "1.4rem"}});
             }
         } else {
-            if (excelMimeTypes.includes(mimeType)) {
+            if (excelMimeTypes.includes(mimeType) && props.fieldType === "excel") {
                 invoke('get_excel_header', {
                     filePath: filePath
                 })
@@ -148,14 +147,16 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
                     })
                     .then((excelHeader: string[]) => {
                         if (excelHeader.length <= 0)
-                            throw new Error("An error occurred while reading the file. Try choosing a different file.");
-                        for (let el of excelHeader) {
-                            // console.log(el)
-                        }
+                            throw new Error("An error occurred while reading the file. Try choosing a different file. \nMake sure the file contains at least 1 email");
+                        // for (let el of excelHeader) {
+                        //     // console.log(el)
+                        // }
                         setCells(excelHeader);
                     })
                     .catch((error) => {
                         console.error(`Error: ${error}`);
+                        toast.error(`${error}`, {style: {"font-size": "1.4rem"}});
+                        setFiles();
                     });
             } else {
                 toast.error(`Oops! Unable to preview file: ${files()}`, {style: {"font-size": "1.4rem"}});
@@ -177,15 +178,51 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
     async function openFile() {
         setFiles(null);
         setIframes([]);
+        setCells();
         let selected: null | string | string[];
 
-        if (props.fieldType === "files") {
-            selected = await open({
-                multiple: true
-            });
-        } else {
-            selected = await open();
+        switch (props.fieldType) {
+            case "files": {
+                selected = await open({
+                    multiple: true
+                });
+                break;
+            }
+            case "pdf": {
+                selected = await open({
+                    filters: [{
+                        name: "Pdf",
+                        extensions: ["pdf"]
+                    }]
+                });
+                break;
+            }
+            case "html": {
+                selected = await open({
+                    filters: [{
+                        name: "Html",
+                        extensions: ["html"]
+                    }]
+                });
+                break;
+            }
+            case "excel": {
+                selected = await open({
+                    filters: [{
+                        name: "Excel",
+                        extensions: ["xlsx", "xlsm", "xlsb", "xltx", "xltm", "xls", "xlt", "xlam", "xla", "xlw"]
+                    }]
+                });
+                break;
+            }
+
+            default: {
+                // fieldType == file
+                selected = await open();
+                break;
+            }
         }
+
 
         if (selected) setFiles(selected);
 
@@ -205,23 +242,29 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
     }
 
 
-
-
     return (
         <div class={files() || props.children ? "form__field customizable" : "form__field"} ref={setElement}>
             <InputFieldDescription {...props}/>
             <div id={props.htmlID} class="form__field-input cur-pointer" title={props.content} onClick={openFile}>
                 {/*{files() ? `Selected file: ${files()}` : props.content}*/}
-                {files() ? (files()?.length! <= 1 ? `${files()}` : `${files()?.length} files have been selected`) : props.content}
+                {
+                    files() ? (
+                        files()?.length! <= 1 ?
+                            `${files()}` :
+                            (props.fieldType === "files" ?
+                                `${files()?.length} files have been selected` :
+                                `${files()}`)
+                    ) : props.content
+                }
             </div>
-            {(files() && iframes() || props.children) && (
+            {(files() && iframes() || props.children) &&
                 <>
-                    <span class="form__field-label settings active" onClick={() => openSubSettings(element())}>
-                        <span class="svg settings-v2"></span>
+                    <span class="form__field-label settings active" onClick={() => openSubSettings(element()!)}>
+                        <span class={(files() || cells()) ? "svg settings-v2 visibility" : "svg settings-v2"}></span>
                     </span>
                     <div class={"form__field-settings none"}>
                         <div class="form__field-settings__close">
-                            <div class="burger active" onClick={() => closeSubSettings(element())}>
+                            <div class="burger active" onClick={() => closeSubSettings(element()!)}>
                                 <span class="burger__span"></span>
                             </div>
                         </div>
@@ -240,7 +283,9 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
                                             <tr>
                                                 <td></td>
                                                 <td>{preview.name}</td>
-                                                <td>{Math.ceil(preview.size / 1024).toString().replace(/\d{1,3}(?=(\d{3})+(?!\d))/g, "$& ")}kb</td>
+                                                <td>
+                                                    {Math.ceil(preview.size / 1024).toString().replace(/\d{1,3}(?=(\d{3})+(?!\d))/g, "$& ")}kb
+                                                </td>
                                             </tr>
                                             </tbody>
                                         </table>
@@ -250,13 +295,13 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
                             </ul>
                         }
                         {cells() &&
-                                <ExcelSelect cells={cells()}/>
+                            <ExcelSelect cells={cells()}/>
                         }
                         <br/><br/><br/><br/><br/><br/><br/><br/>
                         {props.children}
                     </div>
                 </>
-            )}
+            }
         </div>
     );
 }

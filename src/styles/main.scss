@@ -338,7 +338,6 @@ body {
             &:has(.checkbox-label) {
                 border-top-right-radius: .3rem;
                 border-bottom-right-radius: .3rem;
-                justify-content: space-between;
                 padding: 0 .5rem;
                 gap: .5rem;
             }
@@ -875,3 +874,4 @@ input[type=checkbox] {
 .fade-exit-to {
   opacity: 0;
 }
+

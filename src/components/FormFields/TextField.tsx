@@ -11,7 +11,9 @@ const TextField: ParentComponent<FieldOptions> = (props) => {
     const pressing = createKeyHold("Escape", {preventDefault: false});
 
     createEffect(() => {
-        if (pressing()) closeSubSettings(element());
+        if (pressing() && element()) {
+            closeSubSettings(element()!);
+        }
     });
 
     if (!props.children)
@@ -24,22 +26,32 @@ const TextField: ParentComponent<FieldOptions> = (props) => {
         );
     else
         return (
-            <div class="form__field customizable" ref={setElement}>
-                <InputFieldDescription {...props}/>
-                <input id={props.htmlID} type={props.fieldType} class="form__field-input" placeholder={props.content}
-                       title={props.content}/>
-                <span class="form__field-label settings active" onClick={() => openSubSettings(element())}>
-                    <span class="svg settings-v2"></span>
-                </span>
-                <div class={"form__field-settings none"}>
-                    <div class="form__field-settings__close ">
-                        <div class="burger active" onClick={() => closeSubSettings(element())}>
-                            <span class="burger__span"></span>
-                        </div>
-                    </div>
-                    {props.children}
+            <>
+                <div class={(props.children) ? "form__field customizable" : "form__field"} ref={setElement}>
+                    <InputFieldDescription {...props}/>
+                    <input id={props.htmlID} type={props.fieldType} class="form__field-input"
+                           placeholder={props.content}
+                           title={props.content} autocomplete="off"/>
+
+
+                    {(props.children) &&
+                        <>
+                            <span class="form__field-label settings active" onClick={() => openSubSettings(element()!)}>
+                                <span class="svg settings-v2"></span>
+                            </span>
+                            <div class={"form__field-settings none"}>
+                                <div class="form__field-settings__close ">
+                                    <div class="burger active" onClick={() => closeSubSettings(element()!)}>
+                                        <span class="burger__span"></span>
+                                    </div>
+                                </div>
+                                {props.children}
+                            </div>
+                        </>
+                    }
                 </div>
-            </div>
+
+            </>
         );
 }
 
