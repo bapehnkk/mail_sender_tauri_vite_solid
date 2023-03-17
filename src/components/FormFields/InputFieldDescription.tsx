@@ -8,14 +8,14 @@ const InputFieldDescription: ParentComponent<FieldOptions> = (props) => {
             {props.description ?
                 <label for={props.htmlID} class="form__field-label cur-help">
                     <span class={`svg ${props.svg}`}></span>
-                    {props.link ?
+                    {props.description.link ?
                         <a target="_blank"
                            class="form__field-description"
-                           href={props.link}>
-                            {props.description}
+                           href={props.description.link}>
+                            {props.description.description}
                         </a> :
                         <div class="form__field-description">
-                            {props.description}
+                            {props.description.description}
                         </div>
                     }
                     <div class="alert"></div>

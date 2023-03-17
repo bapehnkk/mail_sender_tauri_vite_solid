@@ -1,11 +1,10 @@
-import {createEffect, ParentComponent, Component, onMount, JSX, createSignal, For} from "solid-js";
-import {FieldOptions} from "../FormField";
+import {createEffect, createSignal, For, JSX, ParentComponent} from "solid-js";
+import {closeSubSettings, FieldOptions, openSubSettings} from "../FormField";
 import {createKeyHold} from "@solid-primitives/keyboard";
 import InputFieldDescription from "./InputFieldDescription";
-import {openSubSettings, closeSubSettings} from "../FormField";
 
 import {open} from '@tauri-apps/api/dialog';
-import {readBinaryFile, readTextFile} from '@tauri-apps/api/fs';
+import {readBinaryFile} from '@tauri-apps/api/fs';
 
 import {invoke} from '@tauri-apps/api/tauri';
 
@@ -96,27 +95,30 @@ interface Previews {
 }
 
 const FileField: ParentComponent<FieldOptions> = (props) => {
-
     const [element, setElement] = createSignal<HTMLElement>();
-    const pressing = createKeyHold("Escape", {preventDefault: false});
-    const [files, setFiles] = createSignal<null | string | string[]>();
-    const [iframes, setIframes] = createSignal<Previews[]>([]);
 
+    const [files, setFiles] = createSignal<string[]>([]);
+    const [totalWeight, setTotalWeight] = createSignal<number>(0);
+
+    const [iframes, setIframes] = createSignal<Previews[]>([]);
     const [cells, setCells] = createSignal<string[]>();
 
+    const pressing = createKeyHold("Escape", {preventDefault: false});
     createEffect(() => {
         if (pressing()) closeSubSettings(element()!);
     });
 
+
     const checkFile = async (filePath: string) => {
-        let mimeType = await getMimeType(filePath);
-        // console.log("Mime: " + mimeType);
+        const fileSize = await invoke<string>('get_file_size', {filePath: filePath});
+        if (parseInt(fileSize) + totalWeight() <= maximumSize) {
+            setTotalWeight(parseInt(fileSize) + totalWeight());
+            setFiles([filePath, ...files()]);
+            console.log(`F: ${files()}`);
 
-        if (allowedMimeTypes.includes(mimeType)) {
-            const fileSize = await invoke<string>('get_file_size', {filePath: filePath});
-            // console.log(`File size: ${fileSize}`);
-            if (parseInt(fileSize) <= maximumSize) {
 
+            let mimeType = await getMimeType(filePath);
+            if (allowedMimeTypes.includes(mimeType)) {
                 const binaryData: Uint8Array = await readBinaryFile(filePath);
                 const blob = new Blob([binaryData], {type: mimeType});
 
@@ -128,15 +130,7 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
                     size: parseInt(fileSize),
                     name: filePath
                 }]);
-
-
-                // const extension = `${props.filesPath}`.split('.').pop()!;
-                // console.log(extension);
-            } else {
-                toast.error(`Oops! File is to big.`, {style: {"font-size": "1.4rem"}});
-            }
-        } else {
-            if (excelMimeTypes.includes(mimeType) && props.fieldType === "excel") {
+            } else if (excelMimeTypes.includes(mimeType) && props.fieldType == "excel") {
                 invoke('get_excel_header', {
                     filePath: filePath
                 })
@@ -151,23 +145,40 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
                         // for (let el of excelHeader) {
                         //     // console.log(el)
                         // }
-                        setCells(excelHeader);
+                        // setCells(excelHeader);
+                        setIframes(prevIframes => [...prevIframes, {
+                            iframe: <ExcelSelect cells={excelHeader}/>,
+                            size: parseInt(fileSize),
+                            name: filePath
+                        }]);
                     })
                     .catch((error) => {
                         console.error(`Error: ${error}`);
                         toast.error(`${error}`, {style: {"font-size": "1.4rem"}});
-                        setFiles();
+                        setFiles([]);
                     });
+
             } else {
-                toast.error(`Oops! Unable to preview file: ${files()}`, {style: {"font-size": "1.4rem"}});
+                setIframes(prevIframes => [...prevIframes, {
+                    iframe: <></>,
+                    size: parseInt(fileSize),
+                    name: filePath
+                }]);
             }
+
+        } else {
+            toast.error(`Oops! Total weight already filled or file "${filePath}" is to big.`, {
+                style: {
+                    "font-size": "1.4rem",
+                    "overflow": "scroll"
+                }
+            });
         }
     }
 
     async function getMimeType(filePath: string): Promise<string> {
         try {
-            const mimeType = await invoke<string>('get_mime_type', {filePath: filePath});
-            return mimeType;
+            return await invoke<string>('get_mime_type', {filePath: filePath});
         } catch (error) {
             console.error('Error getting MIME type:', error);
             throw error;
@@ -176,7 +187,7 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
 
     ////////////////////////////////////////////////////
     async function openFile() {
-        setFiles(null);
+        setFiles([]);
         setIframes([]);
         setCells();
         let selected: null | string | string[];
@@ -224,8 +235,6 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
         }
 
 
-        if (selected) setFiles(selected);
-
         if (Array.isArray(selected)) {
             // user selected multiple directories
             console.log(`user selected multiple directories`);
@@ -234,7 +243,7 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
             // user cancelled the selection
             console.log(`user cancelled the selection`);
         } else {
-            // user selected a single directory
+            // user selected a single directoryf
             console.log(`user selected a single directory`);
             checkFile(selected);
         }
@@ -243,13 +252,13 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
 
 
     return (
-        <div class={files() || props.children ? "form__field customizable" : "form__field"} ref={setElement}>
+        <div class={files().length > 0 || props.children ? "form__field customizable" : "form__field"} ref={setElement}>
             <InputFieldDescription {...props}/>
             <div id={props.htmlID} class="form__field-input cur-pointer" title={props.content} onClick={openFile}>
                 {/*{files() ? `Selected file: ${files()}` : props.content}*/}
                 {
-                    files() ? (
-                        files()?.length! <= 1 ?
+                    files().length > 0 ? (
+                        files().length === 1 ?
                             `${files()}` :
                             (props.fieldType === "files" ?
                                 `${files()?.length} files have been selected` :
@@ -257,10 +266,11 @@ const FileField: ParentComponent<FieldOptions> = (props) => {
                     ) : props.content
                 }
             </div>
-            {(files() && iframes() || props.children) &&
+            {(files().length > 0 && iframes() || props.children) &&
                 <>
                     <span class="form__field-label settings active" onClick={() => openSubSettings(element()!)}>
-                        <span class={(files() || cells()) ? "svg settings-v2 visibility" : "svg settings-v2"}></span>
+                        <span
+                            class={(files().length > 0 || cells()) ? "svg settings-v2 visibility" : "svg settings-v2"}></span>
                     </span>
                     <div class={"form__field-settings none"}>
                         <div class="form__field-settings__close">
