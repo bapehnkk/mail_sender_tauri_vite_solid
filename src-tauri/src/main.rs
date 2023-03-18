@@ -74,18 +74,33 @@ fn main() {
                         //     rs2js(format!("i: {}\n out: {}", i, output), &app_handle);
                         // }
 
-                        let parse_excel = read_excel(message.excel_path);
+                        let parse_excel = read_excel(&message);
 
                         // Send email using the data in mail_fields
 
                         for row in parse_excel {
+                            let name_default = String::from("{surname}");
+                            let surname_default = String::from("{surname}");
+
+                            let name = row.names.get(0).unwrap_or(&name_default);
+                            let surname = row.surnames.get(0).unwrap_or(&surname_default);
+
                             for email in row.emails {
+                                let replacements = &[
+                                    SelectorReplacement { selector: "{email}", replacement: &email },
+                                    SelectorReplacement { selector: "{name}", replacement: name },
+                                    SelectorReplacement { selector: "{surname}", replacement: surname }
+                                ];
+
+                                // let output = replace_selectors(input, replacements);
+                                // println!("{}", output);
+                                /////////////
                                 let mail = Mail {
                                     email: email.clone(),
-                                    senders_name: message.senders_name.clone(),
-                                    title: message.title.clone(),
-                                    recipients_name: message.recipients_name.clone(),
-                                    text: message.text.clone(),
+                                    senders_name: replace_selectors(&message.senders_name.clone(), replacements),
+                                    title: replace_selectors(&message.title.clone(), replacements),
+                                    recipients_name: replace_selectors(&message.recipients_name.clone(), replacements),
+                                    text: replace_selectors(&message.text.clone(), replacements),
                                     files: message.files.clone(),
                                 };
                                 match send_mail::main(mail) {
@@ -191,16 +206,16 @@ fn get_file_size(file_path: &str) -> Result<serde_json::Value, tauri::Error> {
 }
 
 
-fn read_excel(excel_path: String) -> Vec<Row> {
+fn read_excel(message: &Message) -> Vec<Row> {
     let file_path = String::from(r"C:\Users\User\Desktop\sspisok jur (karberi 18) 2022.xlsx");
     let email_columns = vec![String::from("EMail"), String::from("E-Mail")];
     let name_columns = vec![String::from("Имя"), String::from("Name")];
     let surname_columns = vec![String::from("Фамилия"), String::from("Surname")];
     let result = file_handler::read_excel_with_email(
-        excel_path,
-        &email_columns,
-        &name_columns,
-        &surname_columns,
+        message.excel_path.clone(),
+        &message.selected_emails,
+        &message.selected_names,
+        &message.selected_surnames,
     );
     println!("result: {:#?}", result);
     result
@@ -259,4 +274,38 @@ async fn send_smtp_mail(
 //         .run(tauri::generate_context!())
 //         .expect("error while running tauri application");
 // }
+
+struct SelectorReplacement<'a> {
+    selector: &'a str,
+    replacement: &'a str,
+}
+
+fn replace_selectors(input: &str, replacements: &[SelectorReplacement]) -> String {
+    let mut output = String::new();
+    let mut last_pos = 0;
+    println!("input: {}", input);
+
+    for SelectorReplacement { selector, replacement } in replacements {
+        println!("selector: {}\nreplacement: {}", selector, replacement);
+
+        // Find the position of the selector in the input string
+        if let Some(start_pos) = input[last_pos..].find(selector) {
+            let start_pos = start_pos + last_pos;
+            let end_pos = start_pos + selector.len();
+
+            // Replace the selector with the replacement string
+            output.push_str(&input[last_pos..start_pos]);
+            output.push_str(replacement);
+            last_pos = end_pos;
+        } else {
+            // Selector not found, append the rest of the input string and return
+            output.push_str(&input[last_pos..]);
+            return output;
+        }
+    }
+
+    output.push_str(&input[last_pos..]);
+    println!("output: {}", output);
+    output
+}
 
