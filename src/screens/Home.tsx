@@ -1,6 +1,7 @@
 import Field from "../components/FormField"
-import {createEffect, createSignal} from 'solid-js';
+import {createEffect, createSignal, onMount} from 'solid-js';
 import {invoke} from "@tauri-apps/api/tauri";
+import {listen} from '@tauri-apps/api/event';
 
 import toast from 'solid-toast';
 import * as querystring from "querystring";
@@ -61,20 +62,20 @@ export default function HomeScreen() {
         };
 
         const mailFields = {
-            sendersName: getElValue("sender-name"),
+            senders_name: getElValue("sender-name"),
             title: getElValue("mail-title"),
-            recipientsName: getElValue("recipients-name"),
+            recipients_name: getElValue("recipients-name"),
             text: getElValue("mail-text"),
             files: files,
-            filePath: excel.filePath,
-            selectedEmails: excel.selects.selectedEmails,
-            selectedNames: excel.selects.selectedNames,
-            selectedSurnames: excel.selects.selectedSurnames,
+            file_path: excel.filePath,
+            selected_emails: excel.selects.selectedEmails,
+            selected_names: excel.selects.selectedNames,
+            selected_surnames: excel.selects.selectedSurnames,
         };
 
         // console.log(MailFields);
 
-        invoke('send_smtp_mail', mailFields)
+        invoke('start_mail_sending', {message: mailFields})
             .then((response) => {
                 console.log(response);
             })
@@ -99,8 +100,25 @@ export default function HomeScreen() {
             toast.success(title());
     });
 
+    function sendOutput() {
+        console.log("js: start_mail_sending: " + "hi");
+        invoke('start_mail_sending', {message: "hi"});
+    }
+
+    onMount(async () => {
+
+
+        await listen('rs2js', (event) => {
+            // console.log("js: rs2js: " + event);
+            let input = event.payload;
+            console.log({timestamp: Date.now(), message: input});
+            // inputs.value.push({timestamp: Date.now(), message: input});
+        })
+    });
+
     return (
         <div class={"container"}>
+            <button onclick={sendOutput}>Say hello</button>
             <div class="form">
                 <Field
                     svg={"sender"}
@@ -201,185 +219,350 @@ export default function HomeScreen() {
                 </div>
 
 
-                {/*<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>*/}
-                {/*<div class="form__field">*/}
-                {/*    <label for="sender-name" class="form__field-label">*/}
-                {/*        <span class="svg sender"></span>*/}
-                {/*    </label>*/}
-                {/*    <input id="sender-name" type="text" class="form__field-input" placeholder="Sender's name"*/}
-                {/*           title="Sender's name"/>*/}
-                {/*</div>*/}
-                {/*<div class="form__field customizable">*/}
-                {/*    <label for="title" class="form__field-label cur-help">*/}
-                {/*        <span class="svg title"></span>*/}
-                {/*        <div class="form__field-description">*/}
-                {/*            Write [name] or [surname] and select Excel column name if you want to personalize the email*/}
-                {/*        </div>*/}
-                {/*    </label>*/}
-                {/*    <input id="title" type="text" class="form__field-input" placeholder="Mail title"*/}
-                {/*           title="Mail title"/>*/}
-                {/*    <span class="form__field-label settings">*/}
-                {/*        <span class="svg settings-v2"></span>*/}
-                {/*    </span>*/}
-                {/*    <div class="form__field-settings none">*/}
-                {/*        <div class="form__field-settings__close ">*/}
-                {/*            <div class="burger active">*/}
-                {/*                <span class="burger__span"></span>*/}
-                {/*            </div>*/}
-                {/*        </div>*/}
-                {/*        /!*{% include 'components/title_settings.html' %}*!/*/}
-                {/*        <div class="form__field">*/}
-                {/*            <label for="" class="form__field-label">*/}
-                {/*                <span class="svg edit-doc"></span>*/}
-                {/*            </label>*/}
-                {/*            <input type="text" class="form__field-input sub" placeholder="Chose title in .pdf"*/}
-                {/*                   title="Chose title in .pdf"/>*/}
-                {/*        </div>*/}
+                {/*<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>*/
+                }
+                {/*<div class="form__field">*/
+                }
+                {/*    <label for="sender-name" class="form__field-label">*/
+                }
+                {/*        <span class="svg sender"></span>*/
+                }
+                {/*    </label>*/
+                }
+                {/*    <input id="sender-name" type="text" class="form__field-input" placeholder="Sender's name"*/
+                }
+                {/*           title="Sender's name"/>*/
+                }
+                {/*</div>*/
+                }
+                {/*<div class="form__field customizable">*/
+                }
+                {/*    <label for="title" class="form__field-label cur-help">*/
+                }
+                {/*        <span class="svg title"></span>*/
+                }
+                {/*        <div class="form__field-description">*/
+                }
+                {/*            Write [name] or [surname] and select Excel column name if you want to personalize the email*/
+                }
+                {/*        </div>*/
+                }
+                {/*    </label>*/
+                }
+                {/*    <input id="title" type="text" class="form__field-input" placeholder="Mail title"*/
+                }
+                {/*           title="Mail title"/>*/
+                }
+                {/*    <span class="form__field-label settings">*/
+                }
+                {/*        <span class="svg settings-v2"></span>*/
+                }
+                {/*    </span>*/
+                }
+                {/*    <div class="form__field-settings none">*/
+                }
+                {/*        <div class="form__field-settings__close ">*/
+                }
+                {/*            <div class="burger active">*/
+                }
+                {/*                <span class="burger__span"></span>*/
+                }
+                {/*            </div>*/
+                }
+                {/*        </div>*/
+                }
+                {/*        /!*{% include 'components/title_settings.html' %}*!/*/
+                }
+                {/*        <div class="form__field">*/
+                }
+                {/*            <label for="" class="form__field-label">*/
+                }
+                {/*                <span class="svg edit-doc"></span>*/
+                }
+                {/*            </label>*/
+                }
+                {/*            <input type="text" class="form__field-input sub" placeholder="Chose title in .pdf"*/
+                }
+                {/*                   title="Chose title in .pdf"/>*/
+                }
+                {/*        </div>*/
+                }
 
-                {/*    </div>*/}
-                {/*</div>*/}
-                {/*<div class="form__field">*/}
-                {/*    <label for="recipients-name" class="form__field-label cur-help">*/}
-                {/*        <span class="svg recipient"></span>*/}
-                {/*        <div class="form__field-description">*/}
-                {/*            Select the column corresponding to the name of the recipient of the letter in Excel*/}
-                {/*        </div>*/}
-                {/*    </label>*/}
-                {/*    <input id="recipients-name" type="text" class="form__field-input" placeholder="Recipient's name"*/}
-                {/*           title="Recipient's name"/>*/}
-                {/*</div>*/}
-
-
-                {/*<div class="form__field customizable textarea">*/}
-                {/*    <textarea id="mail-text" class="form__field-input" name="" cols="30" rows="10"*/}
-                {/*              placeholder="Mail text"*/}
-                {/*              title="Mail text"></textarea>*/}
-                {/*    <span class="form__field-label settings">*/}
-                {/*        <span class="svg settings-v2"></span>*/}
-                {/*    </span>*/}
-                {/*    <div class="form__field-settings none">*/}
-                {/*        <div class="form__field-settings__close ">*/}
-                {/*            <div class="burger active">*/}
-                {/*                <span class="burger__span"></span>*/}
-                {/*            </div>*/}
-                {/*        </div>*/}
-                {/*        /!*{% include 'components/text_settings.html' %}*!/*/}
-
-                {/*        <div class="form__field">*/}
-                {/*            <label class="form__field-label cur-help">*/}
-                {/*                <span class="svg html"></span>*/}
-                {/*                <div class="form__field-description">*/}
-                {/*                    Create a mail template from .html file*/}
-                {/*                </div>*/}
-                {/*            </label>*/}
-                {/*            <label for="choose-html" class="form__field-input sub cur-pointer">*/}
-                {/*                Choose html*/}
-                {/*            </label>*/}
-                {/*            <input type="file" id="choose-html" accept=".html" class="d-none"/>*/}
-                {/*        </div>*/}
-                {/*        <div class="form__field">*/}
-                {/*            <label class="form__field-label cur-help">*/}
-                {/*                <span class="svg pdf"></span>*/}
-                {/*                <div class="form__field-description">*/}
-                {/*                    Create a mail template from pdf file*/}
-                {/*                </div>*/}
-                {/*            </label>*/}
-                {/*            <label for="choose-pdf" class="form__field-input sub cur-pointer">*/}
-                {/*                Choose pdf*/}
-                {/*            </label>*/}
-                {/*            <input type="file" id="choose-pdf" accept=".pdf" class="d-none"/>*/}
-                {/*        </div>*/}
-
-                {/*        <div class="form__field">*/}
-                {/*            <label class="form__field-label cur-help">*/}
-                {/*                <span class="svg pdf"></span>*/}
-                {/*                <div class="form__field-description">*/}
-                {/*                    Create a mail template from pdf file*/}
-                {/*                </div>*/}
-                {/*            </label>*/}
-                {/*            <label class="form__field-input sub cur-pointer">*/}
-                {/*                Choose file*/}
-                {/*            </label>*/}
-                {/*        </div>*/}
-
-                {/*    </div>*/}
-                {/*</div>*/}
+                {/*    </div>*/
+                }
+                {/*</div>*/
+                }
+                {/*<div class="form__field">*/
+                }
+                {/*    <label for="recipients-name" class="form__field-label cur-help">*/
+                }
+                {/*        <span class="svg recipient"></span>*/
+                }
+                {/*        <div class="form__field-description">*/
+                }
+                {/*            Select the column corresponding to the name of the recipient of the letter in Excel*/
+                }
+                {/*        </div>*/
+                }
+                {/*    </label>*/
+                }
+                {/*    <input id="recipients-name" type="text" class="form__field-input" placeholder="Recipient's name"*/
+                }
+                {/*           title="Recipient's name"/>*/
+                }
+                {/*</div>*/
+                }
 
 
-                {/*<div class="form__field customizable">*/}
+                {/*<div class="form__field customizable textarea">*/
+                }
+                {/*    <textarea id="mail-text" class="form__field-input" name="" cols="30" rows="10"*/
+                }
+                {/*              placeholder="Mail text"*/
+                }
+                {/*              title="Mail text"></textarea>*/
+                }
+                {/*    <span class="form__field-label settings">*/
+                }
+                {/*        <span class="svg settings-v2"></span>*/
+                }
+                {/*    </span>*/
+                }
+                {/*    <div class="form__field-settings none">*/
+                }
+                {/*        <div class="form__field-settings__close ">*/
+                }
+                {/*            <div class="burger active">*/
+                }
+                {/*                <span class="burger__span"></span>*/
+                }
+                {/*            </div>*/
+                }
+                {/*        </div>*/
+                }
+                {/*        /!*{% include 'components/text_settings.html' %}*!/*/
+                }
 
-                {/*    <label for="choose-files" class="form__field-label cur-help">*/}
-                {/*        <span class="svg file-present"></span>*/}
-                {/*        <div class="form__field-description">*/}
-                {/*            Select the files to be attached to the email*/}
-                {/*        </div>*/}
-                {/*    </label>*/}
-                {/*    <label for="choose-files" class="form__field-input cur-pointer">*/}
-                {/*        Choose files*/}
-                {/*    </label>*/}
-                {/*    <input type="file" id="choose-files" multiple class="d-none"/>*/}
-                {/*    <span class="form__field-label settings">*/}
-                {/*        <span class="svg settings-v2 visibility"></span>*/}
-                {/*    </span>*/}
-                {/*    <div class="form__field-settings none">*/}
-                {/*        <div class="form__field-settings__close ">*/}
-                {/*            <div class="burger active">*/}
-                {/*                <span class="burger__span"></span>*/}
-                {/*            </div>*/}
-                {/*        </div>*/}
-                {/*        /!*{% include 'components/choose_files.html' %}*!/*/}
-                {/*        <ul class="selected-files">*/}
-                {/*            <li>0 files selected</li>*/}
-                {/*        </ul>*/}
-                {/*    </div>*/}
-                {/*</div>*/}
+                {/*        <div class="form__field">*/
+                }
+                {/*            <label class="form__field-label cur-help">*/
+                }
+                {/*                <span class="svg html"></span>*/
+                }
+                {/*                <div class="form__field-description">*/
+                }
+                {/*                    Create a mail template from .html file*/
+                }
+                {/*                </div>*/
+                }
+                {/*            </label>*/
+                }
+                {/*            <label for="choose-html" class="form__field-input sub cur-pointer">*/
+                }
+                {/*                Choose html*/
+                }
+                {/*            </label>*/
+                }
+                {/*            <input type="file" id="choose-html" accept=".html" class="d-none"/>*/
+                }
+                {/*        </div>*/
+                }
+                {/*        <div class="form__field">*/
+                }
+                {/*            <label class="form__field-label cur-help">*/
+                }
+                {/*                <span class="svg pdf"></span>*/
+                }
+                {/*                <div class="form__field-description">*/
+                }
+                {/*                    Create a mail template from pdf file*/
+                }
+                {/*                </div>*/
+                }
+                {/*            </label>*/
+                }
+                {/*            <label for="choose-pdf" class="form__field-input sub cur-pointer">*/
+                }
+                {/*                Choose pdf*/
+                }
+                {/*            </label>*/
+                }
+                {/*            <input type="file" id="choose-pdf" accept=".pdf" class="d-none"/>*/
+                }
+                {/*        </div>*/
+                }
 
-                {/*<div class="form__field customizable">*/}
-                {/*    <label for="choose-excel" class="form__field-label cur-help">*/}
-                {/*        <span class="svg excel"></span>*/}
-                {/*        <div class="form__field-description">*/}
-                {/*            You must select an Excel file and a column with E-mail*/}
-                {/*        </div>*/}
-                {/*    </label>*/}
-                {/*    <label for="choose-excel" class="form__field-input cur-pointer">*/}
-                {/*        Choose Excel file**/}
-                {/*    </label>*/}
-                {/*    <input type="file"*/}
-                {/*           accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"*/}
-                {/*           id="choose-excel" class="d-none"/>*/}
-                {/*    <span class="form__field-label settings">*/}
-                {/*        <span class="svg settings-v2"></span>*/}
-                {/*    </span>*/}
-                {/*    <div class="form__field-settings none">*/}
-                {/*        <div class="form__field-settings__close ">*/}
-                {/*            <div class="burger active">*/}
-                {/*                <span class="burger__span"></span>*/}
-                {/*            </div>*/}
-                {/*        </div>*/}
-                {/*        <div class="select-columns"></div>*/}
-                {/*    </div>*/}
-                {/*</div>*/}
-                {/*<div class="form__field">*/}
-                {/*    <label for="pdf-duplicate" class="form__field-label cur-pointer">*/}
-                {/*        <span class="svg pdf "></span>*/}
-                {/*    </label>*/}
+                {/*        <div class="form__field">*/
+                }
+                {/*            <label class="form__field-label cur-help">*/
+                }
+                {/*                <span class="svg pdf"></span>*/
+                }
+                {/*                <div class="form__field-description">*/
+                }
+                {/*                    Create a mail template from pdf file*/
+                }
+                {/*                </div>*/
+                }
+                {/*            </label>*/
+                }
+                {/*            <label class="form__field-input sub cur-pointer">*/
+                }
+                {/*                Choose file*/
+                }
+                {/*            </label>*/
+                }
+                {/*        </div>*/
+                }
+
+                {/*    </div>*/
+                }
+                {/*</div>*/
+                }
 
 
-                {/*    <label for="pdf-duplicate" class="form__field-input cur-pointer">*/}
-                {/*        Attach a .pdf file as a duplicate of the mail*/}
-                {/*        <input id="pdf-duplicate" type="checkbox"/><label for="pdf-duplicate"*/}
-                {/*                                                          class="checkbox-label">Toggle</label>*/}
-                {/*    </label>*/}
-                {/*</div>*/}
+                {/*<div class="form__field customizable">*/
+                }
+
+                {/*    <label for="choose-files" class="form__field-label cur-help">*/
+                }
+                {/*        <span class="svg file-present"></span>*/
+                }
+                {/*        <div class="form__field-description">*/
+                }
+                {/*            Select the files to be attached to the email*/
+                }
+                {/*        </div>*/
+                }
+                {/*    </label>*/
+                }
+                {/*    <label for="choose-files" class="form__field-input cur-pointer">*/
+                }
+                {/*        Choose files*/
+                }
+                {/*    </label>*/
+                }
+                {/*    <input type="file" id="choose-files" multiple class="d-none"/>*/
+                }
+                {/*    <span class="form__field-label settings">*/
+                }
+                {/*        <span class="svg settings-v2 visibility"></span>*/
+                }
+                {/*    </span>*/
+                }
+                {/*    <div class="form__field-settings none">*/
+                }
+                {/*        <div class="form__field-settings__close ">*/
+                }
+                {/*            <div class="burger active">*/
+                }
+                {/*                <span class="burger__span"></span>*/
+                }
+                {/*            </div>*/
+                }
+                {/*        </div>*/
+                }
+                {/*        /!*{% include 'components/choose_files.html' %}*!/*/
+                }
+                {/*        <ul class="selected-files">*/
+                }
+                {/*            <li>0 files selected</li>*/
+                }
+                {/*        </ul>*/
+                }
+                {/*    </div>*/
+                }
+                {/*</div>*/
+                }
+
+                {/*<div class="form__field customizable">*/
+                }
+                {/*    <label for="choose-excel" class="form__field-label cur-help">*/
+                }
+                {/*        <span class="svg excel"></span>*/
+                }
+                {/*        <div class="form__field-description">*/
+                }
+                {/*            You must select an Excel file and a column with E-mail*/
+                }
+                {/*        </div>*/
+                }
+                {/*    </label>*/
+                }
+                {/*    <label for="choose-excel" class="form__field-input cur-pointer">*/
+                }
+                {/*        Choose Excel file**/
+                }
+                {/*    </label>*/
+                }
+                {/*    <input type="file"*/
+                }
+                {/*           accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"*/
+                }
+                {/*           id="choose-excel" class="d-none"/>*/
+                }
+                {/*    <span class="form__field-label settings">*/
+                }
+                {/*        <span class="svg settings-v2"></span>*/
+                }
+                {/*    </span>*/
+                }
+                {/*    <div class="form__field-settings none">*/
+                }
+                {/*        <div class="form__field-settings__close ">*/
+                }
+                {/*            <div class="burger active">*/
+                }
+                {/*                <span class="burger__span"></span>*/
+                }
+                {/*            </div>*/
+                }
+                {/*        </div>*/
+                }
+                {/*        <div class="select-columns"></div>*/
+                }
+                {/*    </div>*/
+                }
+                {/*</div>*/
+                }
+                {/*<div class="form__field">*/
+                }
+                {/*    <label for="pdf-duplicate" class="form__field-label cur-pointer">*/
+                }
+                {/*        <span class="svg pdf "></span>*/
+                }
+                {/*    </label>*/
+                }
 
 
-                {/*<div class="form__field">*/}
-                {/*    <button onclick={sendMail} class="form__field-submit" value="Send">*/}
-                {/*        Send*/}
-                {/*        <span class="svg send_mail"></span>*/}
-                {/*    </button>*/}
-                {/*</div>*/}
+                {/*    <label for="pdf-duplicate" class="form__field-input cur-pointer">*/
+                }
+                {/*        Attach a .pdf file as a duplicate of the mail*/
+                }
+                {/*        <input id="pdf-duplicate" type="checkbox"/><label for="pdf-duplicate"*/
+                }
+                {/*                                                          class="checkbox-label">Toggle</label>*/
+                }
+                {/*    </label>*/
+                }
+                {/*</div>*/
+                }
+
+
+                {/*<div class="form__field">*/
+                }
+                {/*    <button onclick={sendMail} class="form__field-submit" value="Send">*/
+                }
+                {/*        Send*/
+                }
+                {/*        <span class="svg send_mail"></span>*/
+                }
+                {/*    </button>*/
+                }
+                {/*</div>*/
+                }
             </div>
         </div>
-    );
+    )
+        ;
 }
