@@ -12,10 +12,6 @@ const SettingsScreen: Component = () => {
 
 
     async function readExcel() {
-        // invoke('read_excel')
-        //     .catch((error) => {
-        //         console.error(error);
-        //     });
 
 
         invoke('get_excel_header', {

@@ -18,10 +18,10 @@ fn array2_to_vec_of_vec<T: Clone>(arr: &Array2<T>) -> Vec<Vec<T>> {
 }
 
 #[derive(Debug)]
-pub struct Row {
-    emails: Vec<String>,
-    names: Vec<String>,
-    surnames: Vec<String>,
+pub(crate) struct Row {
+    pub(crate) emails: Vec<String>,
+    pub(crate) names: Vec<String>,
+    pub(crate) surnames: Vec<String>,
 }
 
 use std::error::Error;

@@ -67,7 +67,7 @@ export default function HomeScreen() {
             recipients_name: getElValue("recipients-name"),
             text: getElValue("mail-text"),
             files: files,
-            file_path: excel.filePath,
+            excel_path: excel.filePath,
             selected_emails: excel.selects.selectedEmails,
             selected_names: excel.selects.selectedNames,
             selected_surnames: excel.selects.selectedSurnames,
@@ -112,6 +112,19 @@ export default function HomeScreen() {
             // console.log("js: rs2js: " + event);
             let input = event.payload;
             console.log({timestamp: Date.now(), message: input});
+            // inputs.value.push({timestamp: Date.now(), message: input});
+        })
+
+        await listen('progress', (event) => {
+            // console.log("js: rs2js: " + event);
+            let input = event.payload;
+            console.log({timestamp: Date.now(), message: input});
+            toast(
+                `${input}`,
+                {
+                    duration: 10000
+                }
+            )
             // inputs.value.push({timestamp: Date.now(), message: input});
         })
     });

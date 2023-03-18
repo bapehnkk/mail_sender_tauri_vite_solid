@@ -19,6 +19,8 @@ use tokio::sync::Mutex;
 use tracing::info;
 use tracing_subscriber;
 use std::{thread, time};
+use crate::file_handler::Row;
+use crate::send_mail::Mail;
 
 #[derive(Debug)]
 #[derive(serde::Deserialize)]
@@ -28,7 +30,7 @@ struct Message {
     recipients_name: String,
     text: String,
     files: Vec<String>,
-    file_path: String,
+    excel_path: String,
     selected_emails: Vec<String>,
     selected_names: Vec<String>,
     selected_surnames: Vec<String>,
@@ -49,7 +51,7 @@ fn main() {
         .manage(AsyncProcInputTx {
             inner: Mutex::new(async_proc_input_tx),
         })
-        .invoke_handler(tauri::generate_handler![start_mail_sending, greet, get_mime_type, get_file_size, send_smtp_mail, read_excel, get_excel_header])
+        .invoke_handler(tauri::generate_handler![start_mail_sending, greet, get_mime_type, get_file_size, send_smtp_mail, get_excel_header])
         .setup(|app| {
             tauri::async_runtime::spawn(async move {
                 async_process_model(async_proc_input_rx, async_proc_output_tx).await
@@ -60,17 +62,51 @@ fn main() {
                 loop {
                     if let Some(message) = async_proc_output_rx.recv().await {
                         println!("senders_name: {}", message.senders_name);
-                        println!("title: {}", message.title);
-                        println!("recipients_name: {}", message.recipients_name);
-                        println!("text: {}", message.text);
-                        println!("files: {:?}", message.files);
-                        println!("file_path: {:?}", message.file_path);
-                        println!("selected_emails: {:?}", message.selected_emails);
-                        println!("selected_names: {:?}", message.selected_names);
-                        println!("selected_surnames: {:?}", message.selected_surnames);
+                        println!("title: {}", &message.title);
+                        println!("recipients_name: {}", &message.recipients_name);
+                        println!("text: {}", &message.text);
+                        println!("files: {:?}", &message.files);
+                        println!("excel_path: {:?}", &message.excel_path);
+                        println!("selected_emails: {:?}", &message.selected_emails);
+                        println!("selected_names: {:?}", &message.selected_names);
+                        println!("selected_surnames: {:?}", &message.selected_surnames);
                         // for i in 0..10 {
                         //     rs2js(format!("i: {}\n out: {}", i, output), &app_handle);
                         // }
+
+                        let parse_excel = read_excel(message.excel_path);
+
+                        // Send email using the data in mail_fields
+
+                        for row in parse_excel {
+                            for email in row.emails {
+                                let mail = Mail {
+                                    email: email.clone(),
+                                    senders_name: message.senders_name.clone(),
+                                    title: message.title.clone(),
+                                    recipients_name: message.recipients_name.clone(),
+                                    text: message.text.clone(),
+                                    files: message.files.clone(),
+                                };
+                                match send_mail::main(mail) {
+                                    Ok(_) => {
+                                        println!("Email sent successfully");
+                                        progress(format!("Success: {}", email.clone()), &app_handle);
+                                        break;
+                                    }
+                                    Err(e) => {
+                                        eprintln!("Error sending email: {}", e);
+                                        progress(format!("Fail: {}", email.clone()), &app_handle);
+                                    }
+                                }
+                                let ten_millis = time::Duration::from_millis(500);
+                                let now = time::Instant::now();
+
+                                thread::sleep(ten_millis);
+
+                                assert!(now.elapsed() >= ten_millis);
+                            }
+                        }
                     }
                 }
             });
@@ -80,6 +116,15 @@ fn main() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
+
+
+fn progress<R: tauri::Runtime>(message: String, manager: &impl Manager<R>) {
+    info!(?message, "progress");
+    manager
+        .emit_all("progress", message)
+        .unwrap();
+}
+
 
 fn rs2js<R: tauri::Runtime>(message: String, manager: &impl Manager<R>) {
     info!(?message, "rs2js");
@@ -146,19 +191,19 @@ fn get_file_size(file_path: &str) -> Result<serde_json::Value, tauri::Error> {
 }
 
 
-#[tauri::command]
-async fn read_excel() {
+fn read_excel(excel_path: String) -> Vec<Row> {
     let file_path = String::from(r"C:\Users\User\Desktop\sspisok jur (karberi 18) 2022.xlsx");
     let email_columns = vec![String::from("EMail"), String::from("E-Mail")];
     let name_columns = vec![String::from("Имя"), String::from("Name")];
     let surname_columns = vec![String::from("Фамилия"), String::from("Surname")];
     let result = file_handler::read_excel_with_email(
-        file_path,
+        excel_path,
         &email_columns,
         &name_columns,
         &surname_columns,
     );
-    println!("{:#?}", result);
+    println!("result: {:#?}", result);
+    result
 }
 
 
