@@ -20,7 +20,6 @@ use tracing::info;
 use tracing_subscriber;
 use std::{thread, time};
 use crate::file_handler::Row;
-use crate::send_mail::Mail;
 
 #[derive(Debug)]
 #[derive(serde::Deserialize)]
@@ -34,6 +33,7 @@ struct Message {
     selected_emails: Vec<String>,
     selected_names: Vec<String>,
     selected_surnames: Vec<String>,
+    html_abs_path: String,
 }
 
 
@@ -41,7 +41,9 @@ struct AsyncProcInputTx {
     inner: Mutex<mpsc::Sender<Message>>,
 }
 
-fn main() {
+
+#[tokio::main]
+async fn main() {
     tracing_subscriber::fmt::init();
 
     let (async_proc_input_tx, async_proc_input_rx) = mpsc::channel(1);
@@ -75,6 +77,7 @@ fn main() {
                         // }
 
                         let parse_excel = read_excel(&message);
+                        progress(format!("Start sending"), &app_handle);
 
                         // Send email using the data in mail_fields
 
@@ -95,15 +98,22 @@ fn main() {
                                 // let output = replace_selectors(input, replacements);
                                 // println!("{}", output);
                                 /////////////
-                                let mail = Mail {
+                                let mail = send_mail::Mail {
                                     email: email.clone(),
                                     senders_name: replace_selectors(&message.senders_name.clone(), replacements),
                                     title: replace_selectors(&message.title.clone(), replacements),
                                     recipients_name: replace_selectors(&message.recipients_name.clone(), replacements),
                                     text: replace_selectors(&message.text.clone(), replacements),
                                     files: message.files.clone(),
+                                    html_abs_path: message.html_abs_path.clone(),
                                 };
-                                match send_mail::main(mail) {
+                                let creds = send_mail::Creds {
+                                    email: "bapehnkk@gmail.com".to_string(),
+                                    password: "hqfjcucnvdxsmlbz".to_string(),
+                                    server: "smtp.gmail.com".to_string(),
+                                };
+
+                                match send_mail::send_mail(mail, creds).await {
                                     Ok(_) => {
                                         println!("Email sent successfully");
                                         progress(format!("Success: {}", email.clone()), &app_handle);
@@ -114,7 +124,7 @@ fn main() {
                                         progress(format!("Fail: {}", email.clone()), &app_handle);
                                     }
                                 }
-                                let ten_millis = time::Duration::from_millis(500);
+                                let ten_millis = time::Duration::from_millis(1500);
                                 let now = time::Instant::now();
 
                                 thread::sleep(ten_millis);
@@ -122,6 +132,7 @@ fn main() {
                                 assert!(now.elapsed() >= ten_millis);
                             }
                         }
+                        progress(format!("End sending"), &app_handle);
                     }
                 }
             });
@@ -207,17 +218,13 @@ fn get_file_size(file_path: &str) -> Result<serde_json::Value, tauri::Error> {
 
 
 fn read_excel(message: &Message) -> Vec<Row> {
-    let file_path = String::from(r"C:\Users\User\Desktop\sspisok jur (karberi 18) 2022.xlsx");
-    let email_columns = vec![String::from("EMail"), String::from("E-Mail")];
-    let name_columns = vec![String::from("Имя"), String::from("Name")];
-    let surname_columns = vec![String::from("Фамилия"), String::from("Surname")];
     let result = file_handler::read_excel_with_email(
         message.excel_path.clone(),
         &message.selected_emails,
         &message.selected_names,
         &message.selected_surnames,
     );
-    println!("result: {:#?}", result);
+    // println!("result: {:#?}", result);
     result
 }
 
@@ -309,3 +316,7 @@ fn replace_selectors(input: &str, replacements: &[SelectorReplacement]) -> Strin
     output
 }
 
+// Протестировать read_excel()
+// Отправка файлов
+// Отправка Html
+// Авторизация / Галочки

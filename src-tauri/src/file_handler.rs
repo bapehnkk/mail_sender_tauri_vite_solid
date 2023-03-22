@@ -25,6 +25,7 @@ pub(crate) struct Row {
 }
 
 use std::error::Error;
+use std::fs;
 
 pub(crate) fn get_header(file_path: String) -> Result<Vec<String>, Box<dyn Error>> {
     let mut header: Vec<String> = vec![];
@@ -149,3 +150,42 @@ fn print_type_of<T>(_: &T) {
     println!("{}", std::any::type_name::<T>())
 }
 
+
+
+// pub(crate) fn get_html_header(file_path: &str) -> Option<String> {
+//     match fs::read_to_string(file_path) {
+//         Ok(content) => {
+//             // Find the index of the closing head tag
+//             match content.find("</head>") {
+//                 Some(index) => Some(content[0..index+7].to_string()), // Include the closing head tag
+//                 None => None, // If the head tag isn't found, return None
+//             }
+//         },
+//         Err(_) => None, // If the file can't be read, return None
+//     }
+// }
+//
+// pub(crate) fn get_html_body(file_path: &str) -> Option<String> {
+//     match fs::read_to_string(file_path) {
+//         Ok(content) => {
+//             // Find the index of the opening body tag
+//             match content.find("<body>") {
+//                 Some(start_index) => {
+//                     // Find the index of the closing body tag
+//                     match content.find("</body>") {
+//                         Some(end_index) => Some(content[start_index+6..end_index].to_string()),
+//                         None => None, // If the closing body tag isn't found, return None
+//                     }
+//                 },
+//                 None => None, // If the opening body tag isn't found, return None
+//             }
+//         },
+//         Err(_) => None, // If the file can't be read, return None
+//     }
+// }
+pub(crate) fn read_html_file(file_path: &str) -> String {
+    match fs::read_to_string(file_path) {
+        Ok(content) => content,
+        Err(_) => String::new(),
+    }
+}

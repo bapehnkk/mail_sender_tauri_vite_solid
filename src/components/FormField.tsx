@@ -37,7 +37,8 @@ export interface  FieldOptions {
     htmlID: string,
     svg?: string,
     content?: string,
-    description?: DescriptionOptions
+    description?: DescriptionOptions,
+    required?: any, // it depends on the task being tested
 }
 
 interface FieldTypes {

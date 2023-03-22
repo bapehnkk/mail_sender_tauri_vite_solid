@@ -50,11 +50,17 @@ export default function HomeScreen() {
 
 
     async function sendMail() {
+        if (document.getElementById("choose-excel")!.innerText === "Choose Excel file*") {
+            toast.error("Choose Excel file*");
+            return
+        }
+
         const getElValue = (id: string): string => {
             const input = document.getElementById(id) as HTMLInputElement | null;
             return input!.value;
         };
         let files: string[] = Array.from(document.getElementById("choose-files")!.parentElement!.querySelectorAll(".fileName"), fileName => fileName.innerHTML);
+        let htmlFile: string = document.getElementById("choose-html")!.innerText === "Create a mail template from .html file" ? "" : document.getElementById("choose-html")!.innerText;
 
         const excel: Excel = {
             filePath: document.getElementById("choose-excel")!.innerHTML,
@@ -71,7 +77,9 @@ export default function HomeScreen() {
             selected_emails: excel.selects.selectedEmails,
             selected_names: excel.selects.selectedNames,
             selected_surnames: excel.selects.selectedSurnames,
+            html_abs_path: htmlFile
         };
+
 
         // console.log(MailFields);
 
@@ -131,7 +139,7 @@ export default function HomeScreen() {
 
     return (
         <div class={"container"}>
-            <button onclick={sendOutput}>Say hello</button>
+            {/*<button onclick={sendOutput}>Say hello</button>*/}
             <div class="form">
                 <Field
                     svg={"sender"}
