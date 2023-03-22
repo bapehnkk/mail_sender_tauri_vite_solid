@@ -1,7 +1,25 @@
-# Tauri + Solid + Typescript
+# Mail Sender
 
-This template should help get you started developing with Tauri, Solid and Typescript in Vite.
+Mass mailing of messages. 
+The recipients are taken from Excel. 
+Format strings using selectors {email}, {name}, {surname}. 
+You can send plain text and html.
 
-## Recommended IDE Setup
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+## Installation
+
+### Dependencies
+[Rust](https://www.rust-lang.org/)
+[Node](https://nodejs.org/en)
+
+### Dev
+
+```
+npm tauri dev
+```
+
+### Build
+
+```
+npm tauri build
+```
