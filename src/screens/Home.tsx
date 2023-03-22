@@ -72,7 +72,7 @@ const HomeScreen: ParentComponent<Creds> = (props) => {
             const input = document.getElementById(id) as HTMLInputElement | null;
             return input!.value;
         };
-        let files: string[] = Array.from(document.getElementById("choose-files")!.parentElement!.querySelectorAll(".fileName"), fileName => fileName.innerHTML);
+        let files: string[] = []; // Array.from(document.getElementById("choose-files")!.parentElement!.querySelectorAll(".fileName"), fileName => fileName.innerHTML);
         let htmlFile: string = document.getElementById("choose-html")!.innerText === "Create a mail template from .html file" ? "" : document.getElementById("choose-html")!.innerText;
 
         const excel: Excel = {
