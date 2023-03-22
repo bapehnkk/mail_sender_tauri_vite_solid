@@ -165,7 +165,7 @@ const HomeScreen: ParentComponent<Creds> = (props) => {
                         fieldType={"text"}
                         content={"Mail title"}
                         description={{
-                            description: "Write [name] or [surname] and select Excel column name if you want to personalize the email"
+                            description: "Write {email} or {name} or {surname} and select Excel column name if you want to personalize the email"
                         }}
                     >
                         <Field
