@@ -5,6 +5,9 @@ use lettre::transport::smtp::Error;
 use lettre::transport::smtp::response::Response;
 use crate::file_handler::{read_html_file};
 
+use local_ip_address::local_ip;
+use chrono::Local;
+
 
 pub(crate) struct Mail {
     pub(crate) email: String,
@@ -16,6 +19,8 @@ pub(crate) struct Mail {
     pub(crate) html_abs_path: String,
 }
 
+#[derive(Debug)]
+#[derive(serde::Deserialize)]
 pub(crate) struct Creds {
     pub(crate) email: String,
     pub(crate) password: String,
@@ -51,6 +56,32 @@ pub(crate) async fn send_mail(
 
     let smtp_credentials =
         Credentials::new(creds.email, creds.password);
+
+    let mailer = SmtpTransport::relay(creds.server.as_str())
+        .unwrap()
+        .credentials(smtp_credentials)
+        .build();
+
+    mailer.send(&email)
+}
+
+pub(crate) async fn validate_creds(
+    creds: Creds
+) -> Result<Response, Error>  {
+    let my_local_ip = local_ip().unwrap();
+    let now = Local::now();
+    let current_time = now.format("%H:%M:%S").to_string();
+
+    let email = Message::builder()
+        .from(format!("{} <{}>", creds.email.clone(), creds.email.clone()).parse().unwrap())
+        .to(format!("{} <{}>", creds.email.clone(), creds.email.clone()).parse().unwrap())
+        .subject(String::from("Warning: You are logged into the Mail Sender app"))
+        .header(ContentType::TEXT_PLAIN)
+        .body(format!("You are logged into the Mail Sender application from IP address: \n{:?}\nTime: {:?}", my_local_ip, current_time))
+        .unwrap();
+
+    let smtp_credentials =
+        Credentials::new(creds.email.clone(), creds.password);
 
     let mailer = SmtpTransport::relay(creds.server.as_str())
         .unwrap()

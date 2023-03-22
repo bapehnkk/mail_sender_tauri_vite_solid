@@ -34,6 +34,7 @@ struct Message {
     selected_names: Vec<String>,
     selected_surnames: Vec<String>,
     html_abs_path: String,
+    creds: send_mail::Creds,
 }
 
 
@@ -53,7 +54,7 @@ async fn main() {
         .manage(AsyncProcInputTx {
             inner: Mutex::new(async_proc_input_tx),
         })
-        .invoke_handler(tauri::generate_handler![start_mail_sending, greet, get_mime_type, get_file_size, send_smtp_mail, get_excel_header])
+        .invoke_handler(tauri::generate_handler![start_mail_sending, greet, get_mime_type, get_file_size, send_smtp_mail, get_excel_header, creds_is_valid])
         .setup(|app| {
             tauri::async_runtime::spawn(async move {
                 async_process_model(async_proc_input_rx, async_proc_output_tx).await
@@ -108,9 +109,9 @@ async fn main() {
                                     html_abs_path: message.html_abs_path.clone(),
                                 };
                                 let creds = send_mail::Creds {
-                                    email: "bapehnkk@gmail.com".to_string(),
-                                    password: "hqfjcucnvdxsmlbz".to_string(),
-                                    server: "smtp.gmail.com".to_string(),
+                                    email: message.creds.email.clone(),
+                                    password: message.creds.password.clone(),
+                                    server: message.creds.server.clone(),
                                 };
 
                                 match send_mail::send_mail(mail, creds).await {
@@ -198,6 +199,28 @@ async fn async_process_model(
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
+}
+
+#[tauri::command]
+async fn creds_is_valid(creds: send_mail::Creds) -> bool {
+    println!("email: {}, pass: {}, server: {}", creds.email, creds.password, creds.server);
+    match file_handler::validate_email(creds.email.as_str()) {
+        true => {
+            match send_mail::validate_creds(creds).await {
+                Ok(_) => {
+                    true
+                }
+                Err(e) => {
+                    println!("Error: {:?}", e);
+                    false
+                }
+            }
+        }
+        false => {
+            println!("Email not valid");
+            false
+        }
+    }
 }
 
 #[tauri::command]
